@@ -18,7 +18,7 @@ const productVariantSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: true,
+      required: false,
       default: "",
       trim: true,
       maxlength: 1000,

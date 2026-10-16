@@ -19,4 +19,9 @@ beforeEach(async () => {
       await collection.deleteMany({});
     }
   }
+  // Ensure unique indexes are built and synced for fresh tests
+  await Promise.all(
+    Object.values(mongoose.models).map((model) => model.syncIndexes()),
+  );
 });
+

@@ -5,7 +5,7 @@ import { z } from "zod";
 dotenv.config({ quiet: true });
 
 const processEnvSchema = z.object({
-  PORT: z.coerce.number(),
+  PORT: z.coerce.number().default(4000),
   NODE_ENV: z
     .enum(["development", "production", "testing"])
     .default("development"),
@@ -16,7 +16,7 @@ const processEnvSchema = z.object({
   REFRESH_TOKEN_EXPIRY: z.string().default("7d"),
   LOGIN_WINDOW_MS: z.string().default("10000"),
   LOGIN_MAX_ATTEMPTS: z.string().default("5"),
-  CORS_ORIGIN: z.string()
+  CORS_ORIGIN: z.string().default("http://localhost:5173"),
 });
 
 const result = processEnvSchema.safeParse(process.env);

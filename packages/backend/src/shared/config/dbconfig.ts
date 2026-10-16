@@ -28,7 +28,7 @@ const mongo_Options: ConnectOptions = {
 
   bufferCommands: false,
 
-  autoIndex: env.NODE_ENV === "development" ? true : false,
+  autoIndex: env.NODE_ENV === "production" ? false : true,
 };
 
 // retrying options

@@ -240,6 +240,7 @@ export const variantProductParamsSchema = z.object({
 // ---------------------------------------------------------------------------
 // Inferred TypeScript types
 // ---------------------------------------------------------------------------
-export type CreateProductVariantInput = z.infer<typeof createProductVariantSchema>["body"];
-export type UpdateProductVariantInput = z.infer<typeof updateProductVariantSchema>["body"];
+export type CreateProductVariantInput = z.input<typeof createProductVariantSchema>["body"];
+export type UpdateProductVariantInput = z.input<typeof updateProductVariantSchema>["body"];
+
 
