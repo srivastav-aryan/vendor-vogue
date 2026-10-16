@@ -66,6 +66,51 @@ export const productControllerCreator = (
       }
     },
 
+    getProductWithVariantsBySlug: async (
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> => {
+      const ctx = createCtx(req, "get_product_with_variants_by_slug");
+      try {
+        const { product, variants } =
+          await productService.getProductWithVariantsBySlug(
+            req.params.slug,
+            ctx,
+          );
+
+        res.status(200).json({
+          success: true,
+          data: ProductMapper.toProductWithVariantsResponse(product, variants),
+        });
+      } catch (error) {
+        next(error);
+      }
+    },
+
+    getProductWithVariantsById: async (
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> => {
+      const ctx = createCtx(req, "get_product_with_variants_by_id");
+      try {
+        const { product, variants } =
+          await productService.getProductWithVariantsById(
+            req.params.id,
+            ctx,
+          );
+
+        res.status(200).json({
+          success: true,
+          data: ProductMapper.toProductWithVariantsResponse(product, variants),
+        });
+      } catch (error) {
+        next(error);
+      }
+    },
+
+
     listProducts: async (
       req: Request,
       res: Response,

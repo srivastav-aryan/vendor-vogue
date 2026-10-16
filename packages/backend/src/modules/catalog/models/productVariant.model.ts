@@ -55,6 +55,7 @@ const productVariantSchema = new mongoose.Schema(
     sellingPrice: { type: Number, required: true, default: 0, min: 0 },
     costPrice: { type: Number, default: 0, min: 0 },
     mrp: { type: Number, required: true, min: 0 },
+    isActive: { type: Boolean, required: true, default: true },
   },
   { timestamps: true },
 );

@@ -13,6 +13,7 @@ import {
   brandRouter,
   categoryRouter,
   productRouter,
+  variantRouter,
 } from "./composition/app.composition.js";
 
 const setupMiddleWares = (app: express.Application): void => {
@@ -117,6 +118,7 @@ export const createApp = (): express.Application => {
   app.use("/api/catalog/brands", brandRouter);
   app.use("/api/catalog/categories", categoryRouter);
   app.use("/api/catalog/products", productRouter);
+  app.use("/api/catalog/variants", variantRouter);
 
   //global error handler
   app.use(globalErrorHandler);

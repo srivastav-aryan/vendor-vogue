@@ -1,9 +1,15 @@
-import { ProductResponse, ProductDetailResponse } from "@e-com/shared/types";
+import {
+  ProductResponse,
+  ProductDetailResponse,
+  ProductWithVariantsResponse,
+} from "@e-com/shared/types";
 import {
   LeanProduct,
   ProductDocument,
   PopulatedLeanProduct,
 } from "../models/product.model.js";
+import { LeanProductVariant } from "../models/productVariant.model.js";
+import { ProductVariantMapper } from "./productVariant.mapper.js";
 
 type ProductSource = LeanProduct | ProductDocument;
 
@@ -72,4 +78,19 @@ export class ProductMapper {
           : String(product.updatedAt),
     };
   }
+
+  /**
+   * Maps a populated product with an array of variants to the storefront ProductWithVariantsResponse DTO.
+   */
+  static toProductWithVariantsResponse(
+    product: PopulatedLeanProduct,
+    variants: LeanProductVariant[],
+  ): ProductWithVariantsResponse {
+    const detail = ProductMapper.toDetailResponse(product);
+    return {
+      ...detail,
+      variants: ProductVariantMapper.toResponseList(variants),
+    };
+  }
 }
+

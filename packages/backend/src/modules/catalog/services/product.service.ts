@@ -165,6 +165,61 @@ export class ProductService implements IProductService {
     return product as unknown as PopulatedLeanProduct;
   }
 
+  async getProductWithVariantsBySlug(
+    slug: string,
+    ctx?: RequestContext,
+  ): Promise<{
+    product: PopulatedLeanProduct;
+    variants: import("../models/productVariant.model.js").LeanProductVariant[];
+  }> {
+    ctx?.logger?.debug({ slug }, "Fetching product with variants by slug");
+
+    const product = await this.getProductBySlug(slug, ctx);
+
+    const variants = await ProductVariant.find({
+      productId: product._id,
+      isActive: true,
+    }).lean();
+
+    const variantsWithAvailableStock = variants.map((v) => ({
+      ...v,
+      availableStock: Math.max(0, v.stockQuantity - v.reservedQuantity),
+    })) as unknown as import("../models/productVariant.model.js").LeanProductVariant[];
+
+    return {
+      product,
+      variants: variantsWithAvailableStock,
+    };
+  }
+
+  async getProductWithVariantsById(
+    id: string,
+    ctx?: RequestContext,
+  ): Promise<{
+    product: PopulatedLeanProduct;
+    variants: import("../models/productVariant.model.js").LeanProductVariant[];
+  }> {
+    ctx?.logger?.debug({ productId: id }, "Fetching product with variants by ID");
+
+    const product = await this.getProductById(id, ctx);
+
+    const variants = await ProductVariant.find({
+      productId: product._id,
+      isActive: true,
+    }).lean();
+
+    const variantsWithAvailableStock = variants.map((v) => ({
+      ...v,
+      availableStock: Math.max(0, v.stockQuantity - v.reservedQuantity),
+    })) as unknown as import("../models/productVariant.model.js").LeanProductVariant[];
+
+    return {
+      product,
+      variants: variantsWithAvailableStock,
+    };
+  }
+
+
   async listProducts(
     query: ProductListQuery,
     ctx?: RequestContext,

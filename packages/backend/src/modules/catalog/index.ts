@@ -25,6 +25,7 @@ export {
 export { BrandService } from "./services/brand.service.js";
 export { CategoryService } from "./services/category.service.js";
 export { ProductService } from "./services/product.service.js";
+export { VariantService } from "./services/variant.service.js";
 
 // Interfaces
 export type { IBrandService } from "./interfaces/brand.service.interface.js";
@@ -33,20 +34,25 @@ export type { ICategoryServices } from "./interfaces/category.service.interface.
 export type { ICategoryControllerInterface } from "./interfaces/category.controller.interface.js";
 export type { IProductService } from "./interfaces/product.service.interface.js";
 export type { ProductControllerInterface } from "./interfaces/product.controller.interface.js";
+export type { IVariantService } from "./interfaces/variant.service.interface.js";
+export type { VariantControllerInterface } from "./interfaces/variant.controller.interface.js";
 
 // Controllers
 export { brandControllerCreator } from "./controllers/brand.controller.js";
 export { categoryControllerCreator } from "./controllers/category.controller.js";
 export { productControllerCreator } from "./controllers/product.controller.js";
+export { variantControllerCreator } from "./controllers/variant.controller.js";
 
 // Routes
 export { createBrandRouter } from "./routes/brand.routes.js";
 export { createCategoryRouter } from "./routes/category.routes.js";
 export { createProductRouter } from "./routes/product.routes.js";
+export { createVariantRouter } from "./routes/variant.routes.js";
 
 // Mappers
 export { CategoryMapper } from "./mappers/category.mapper.js";
 export { ProductMapper } from "./mappers/product.mapper.js";
+export { ProductVariantMapper } from "./mappers/productVariant.mapper.js";
 
 // Errors
 export {
@@ -54,3 +60,4 @@ export {
   type CatalogErrorCode,
   CATALOG_ERROR_CODES,
 } from "./errors/catalog.errors.js";
+

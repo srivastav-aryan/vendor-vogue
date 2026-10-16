@@ -10,9 +10,15 @@ import {
   productSlugParamSchema,
 } from "@e-com/shared/schemas";
 import { ProductControllerInterface } from "../interfaces/product.controller.interface.js";
+import { VariantControllerInterface } from "../interfaces/variant.controller.interface.js";
+import {
+  createProductVariantSchema,
+  variantProductParamsSchema,
+} from "@e-com/shared/schemas";
 
 export const createProductRouter = (
   productController: ProductControllerInterface,
+  variantController: VariantControllerInterface,
   authenticate: RequestHandler,
 ) => {
   const productRouter = express.Router();
@@ -26,11 +32,32 @@ export const createProductRouter = (
     productController.listProducts,
   );
 
+  // Storefront Aggregation: GET /api/catalog/products/slug/:slug/storefront — Product + Variants in one call
+  productRouter.get(
+    "/slug/:slug/storefront",
+    validateReq(productSlugParamSchema),
+    productController.getProductWithVariantsBySlug,
+  );
+
+  // Storefront Aggregation: GET /api/catalog/products/:id/storefront — Product + Variants in one call
+  productRouter.get(
+    "/:id/storefront",
+    validateReq(productIdParamSchema),
+    productController.getProductWithVariantsById,
+  );
+
   // GET /api/catalog/products/slug/:slug — Get product by slug (storefront detail)
   productRouter.get(
     "/slug/:slug",
     validateReq(productSlugParamSchema),
     productController.getProductBySlug,
+  );
+
+  // GET /api/catalog/products/:productId/variants — Fetches all purchasable SKUs under a product
+  productRouter.get(
+    "/:productId/variants",
+    validateReq(variantProductParamsSchema),
+    variantController.getVariantsByProductId,
   );
 
   // GET /api/catalog/products/:id — Get product by ID
@@ -41,6 +68,16 @@ export const createProductRouter = (
   );
 
   // ---- Protected routes (auth + permission required) ----
+
+  // POST /api/catalog/products/:productId/variants — Creates physical SKU under product
+  productRouter.post(
+    "/:productId/variants",
+    authenticate,
+    authorize(PERMISSIONS.PRODUCTS_CREATE),
+    validateReq(createProductVariantSchema),
+    variantController.createVariant,
+  );
+
 
   // POST /api/catalog/products — Create a new product
   productRouter.post(

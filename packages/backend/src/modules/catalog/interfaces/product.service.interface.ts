@@ -23,6 +23,23 @@ export interface IProductService {
     ctx?: RequestContext,
   ): Promise<PopulatedLeanProduct>;
 
+  getProductWithVariantsBySlug(
+    slug: string,
+    ctx?: RequestContext,
+  ): Promise<{
+    product: PopulatedLeanProduct;
+    variants: import("../models/productVariant.model.js").LeanProductVariant[];
+  }>;
+
+  getProductWithVariantsById(
+    id: string,
+    ctx?: RequestContext,
+  ): Promise<{
+    product: PopulatedLeanProduct;
+    variants: import("../models/productVariant.model.js").LeanProductVariant[];
+  }>;
+
+
   listProducts(
     query: ProductListQuery,
     ctx?: RequestContext,

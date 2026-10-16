@@ -27,6 +27,10 @@ import {
   productControllerCreator,
   ProductControllerInterface,
   createProductRouter,
+  VariantService,
+  variantControllerCreator,
+  VariantControllerInterface,
+  createVariantRouter,
 } from "../modules/catalog/index.js";
 
 // ******** Identity Module ********
@@ -63,7 +67,12 @@ const categoryService = new CategoryService();
 export const categoryController: ICategoryControllerInterface = categoryControllerCreator(categoryService);
 export const categoryRouter = createCategoryRouter(categoryController, authenticateMiddleware);
 
-// --- Product ---
+// --- Product & Variants ---
+const variantService = new VariantService();
+export const variantController: VariantControllerInterface = variantControllerCreator(variantService);
+export const variantRouter = createVariantRouter(variantController, authenticateMiddleware);
+
 const productService = new ProductService();
 export const productController: ProductControllerInterface = productControllerCreator(productService);
-export const productRouter = createProductRouter(productController, authenticateMiddleware);
+export const productRouter = createProductRouter(productController, variantController, authenticateMiddleware);
+
