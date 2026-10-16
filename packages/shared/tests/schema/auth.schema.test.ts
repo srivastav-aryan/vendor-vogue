@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   userLoginSchema,
   userRegistrationSchema,
-} from "../../src/schemas/auth.schema";
+} from "../../src/schemas/identity/auth.schema.js";
 
 describe("Authentication schema tests", () => {
   describe("User Registeration schema test", () => {
