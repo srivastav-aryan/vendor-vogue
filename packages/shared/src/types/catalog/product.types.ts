@@ -32,3 +32,8 @@ export type ProductDetailResponse = Omit<ProductResponse, "category" | "brand"> 
   category: PopulatedCategoryRef;
   brand: PopulatedBrandRef;
 };
+
+export type ProductWithVariantsResponse = ProductDetailResponse & {
+  variants: import("./variant.types.js").VariantResponse[];
+};
+

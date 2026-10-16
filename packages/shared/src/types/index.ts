@@ -4,6 +4,8 @@ export * from "./common/pagination.types.js";
 export * from "./catalog/brand.types.js";
 export * from "./catalog/category.types.js";
 export * from "./catalog/product.types.js";
+export * from "./catalog/variant.types.js";
 export * from "./navigation.js";
+
 
 

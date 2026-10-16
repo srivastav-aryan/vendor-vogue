@@ -229,8 +229,17 @@ export const updateProductVariantSchema = z.object({
   params: z.object({ id: objectIdAtom }),
 });
 
+export const variantIdParamSchema = z.object({
+  params: z.object({ id: objectIdAtom }),
+});
+
+export const variantProductParamsSchema = z.object({
+  params: z.object({ productId: objectIdAtom }),
+});
+
 // ---------------------------------------------------------------------------
 // Inferred TypeScript types
 // ---------------------------------------------------------------------------
 export type CreateProductVariantInput = z.infer<typeof createProductVariantSchema>["body"];
 export type UpdateProductVariantInput = z.infer<typeof updateProductVariantSchema>["body"];
+
