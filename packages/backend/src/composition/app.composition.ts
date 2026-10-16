@@ -80,4 +80,9 @@ export const productRouter = createProductRouter(productController, variantContr
 import { InventoryService } from "../modules/inventory/index.js";
 export const inventoryService = new InventoryService();
 
+// *********** Pricing Module **********
+import { PricingService } from "../modules/pricing/index.js";
+export const pricingService = new PricingService();
+
+
 
