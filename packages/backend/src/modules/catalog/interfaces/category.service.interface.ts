@@ -1,0 +1,30 @@
+import { CategoryListQuery, CreateCategoryInput } from "@e-com/shared/schemas";
+import { RequestContext } from "../../../shared/types/request-context.js";
+import { PaginatedResult } from "../../../shared/utils/pagination.utils.js";
+import { LeanCategory } from "../models/category.model.js";
+import { CategoryWithStatus } from "../services/category.service.js";
+import {
+  CategoryDetailResponse,
+  CategoryTreeResponse,
+} from "@e-com/shared/types";
+
+export interface ICategoryServices {
+  createCategory(
+    input: CreateCategoryInput,
+    ctx?: RequestContext,
+  ): Promise<LeanCategory>;
+
+  getCategory(
+    query: CategoryListQuery,
+    ctx?: RequestContext,
+  ): Promise<PaginatedResult<CategoryWithStatus>>;
+
+  getCategoryTree(ctx?: RequestContext): Promise<CategoryWithStatus[]>;
+
+  getTree(
+    query: CategoryListQuery,
+    ctx?: RequestContext,
+  ): Promise<CategoryTreeResponse[]>;
+
+  getTreeNode(id: string, ctx?: RequestContext): Promise<CategoryDetailResponse>;
+}
