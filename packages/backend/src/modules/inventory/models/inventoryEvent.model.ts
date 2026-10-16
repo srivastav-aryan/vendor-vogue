@@ -10,7 +10,7 @@ export type InventoryEventType =
   | "RESERVATION_FULFILLED" // cart checked out, reservation converted to sale
   | "MANUAL_ADJUSTMENT"; // admin corrected a discrepancy
 
-export interface IInventoryEvent extends Document {
+export interface IInventoryEvent extends mongoose.Document {
   productVariantId: mongoose.Types.ObjectId;
   ResultingStockQuantity: number;
   ResultingReservedQuantity: number;

@@ -76,3 +76,8 @@ const productService = new ProductService();
 export const productController: ProductControllerInterface = productControllerCreator(productService);
 export const productRouter = createProductRouter(productController, variantController, authenticateMiddleware);
 
+// *********** Inventory Module **********
+import { InventoryService } from "../modules/inventory/index.js";
+export const inventoryService = new InventoryService();
+
+

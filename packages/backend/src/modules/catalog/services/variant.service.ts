@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import {
   CreateProductVariantInput,
   UpdateProductVariantInput,
@@ -9,6 +10,7 @@ import {
   ProductVariant,
 } from "../models/productVariant.model.js";
 import { Product } from "../models/product.model.js";
+import { InventoryEvent } from "../../inventory/models/inventoryEvent.model.js";
 import { CatalogError } from "../errors/catalog.errors.js";
 import { generateSlug } from "../../../shared/utils/slug.utils.js";
 import {
@@ -70,10 +72,18 @@ export class VariantService implements IVariantService {
         isActive: true,
       });
 
-      ctx?.logger?.info(
-        { variantId: variant.id, sku: variant.sku },
-        "Product variant created successfully",
-      );
+      const openingStock = input.stockQuantity ?? 0;
+      if (openingStock > 0) {
+        // Record initial opening stock event in ledger
+        await InventoryEvent.create({
+          productVariantId: variant._id,
+          eventType: "RESTOCK",
+          delta: openingStock,
+          ResultingStockQuantity: openingStock,
+          ResultingReservedQuantity: 0,
+          reason: "Initial opening stock upon variant creation",
+        });
+      }
 
       const obj = variant.toObject() as unknown as LeanProductVariant;
       obj.availableStock = variant.stockQuantity - variant.reservedQuantity;

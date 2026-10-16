@@ -20,6 +20,7 @@ export default defineConfig({
   test: {
     globals: true, // so you can use describe/it/expect without imports
     environment: "node",
+    fileParallelism: false,
     include: ["tests/**/*.test.ts"],
     env: {
       NODE_ENV: "testing",
