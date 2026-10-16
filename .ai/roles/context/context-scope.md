@@ -215,11 +215,7 @@ Express routes with Zod request validation. Error handling middleware that maps 
 TTL hook verification, nightly integrity check, Typesense sync job, dead letter queue setup with BullMQ + Redis.
 
 ### Phase 5 — Observability
-Correlation ID middleware, structured logging (Winston or Pino), integrity alerting.
-
-### Out of scope (V1)
-Shipping/courier integration (Shiprocket, Delhivery). Payment gateway integration. Customer authentication and profile management. Admin dashboard UI. Multi-vendor/marketplace support.
-
+Correlation ID middleware, structured logging (Winston or Pino), integrity alert
 ---
 
 ## Tech Stack
