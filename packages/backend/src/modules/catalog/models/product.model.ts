@@ -53,8 +53,9 @@ const productSchema = new mongoose.Schema(
 );
 
 productSchema.index({ slug: 1 }, { unique: true }); // this is ok for single vendor, but not for multi-vendor
-productSchema.index({ category: 1 , isActive: 1});
-productSchema.index({ brand: 1 , isActive: 1})
+productSchema.index({ category: 1, isActive: 1 });
+productSchema.index({ brand: 1, isActive: 1 });
+productSchema.index({ tags: 1 });
 
 type ProductProps = InferSchemaType<typeof productSchema>;
 
@@ -64,6 +65,20 @@ export type LeanProduct = Omit<ProductProps, "category" | "brand"> & {
   brand: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
+};
+
+export type PopulatedLeanProduct = Omit<LeanProduct, "category" | "brand"> & {
+  category: {
+    _id: mongoose.Types.ObjectId;
+    name: string;
+    slug: string;
+  };
+  brand: {
+    _id: mongoose.Types.ObjectId;
+    name: string;
+    slug: string;
+    logo?: string | null;
+  };
 };
 
 export type ProductDocument = HydratedDocument<ProductProps>;

@@ -20,6 +20,7 @@ import {
 } from "../../constants/index.js";
 import {
   attributeAtom,
+  imagesArrayAtom,
   imagesAtom,
   objectIdAtom,
   priceAtom,
@@ -202,7 +203,7 @@ export const updateProductVariantSchema = z.object({
         )
         .optional(),
 
-      images:   imagesAtom(MAX_IMAGES_PER_VARIANT).optional(),
+      images:   imagesArrayAtom(MAX_IMAGES_PER_VARIANT).optional(),
       isActive: z.boolean().optional(),
     })
     .refine((data) => Object.keys(data).length > 0, {

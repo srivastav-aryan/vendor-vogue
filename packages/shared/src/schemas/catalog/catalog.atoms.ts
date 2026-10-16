@@ -133,11 +133,11 @@ export const imageUrlAtom = z
 //
 // .default([]) — missing "images" key is treated as empty array, not an error.
 // ---------------------------------------------------------------------------
+export const imagesArrayAtom = (maxImages: number) =>
+  z.array(imageUrlAtom).max(maxImages, `Cannot upload more than ${maxImages} images`);
+
 export const imagesAtom = (maxImages: number) =>
-  z
-    .array(imageUrlAtom)
-    .max(maxImages, `Cannot upload more than ${maxImages} images`)
-    .default([]);
+  imagesArrayAtom(maxImages).default([]);
 
 // ---------------------------------------------------------------------------
 // attributeAtom

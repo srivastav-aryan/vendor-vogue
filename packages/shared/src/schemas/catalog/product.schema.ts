@@ -23,7 +23,12 @@ import {
   MAX_TAGS_PER_PRODUCT,
   MAX_IMAGES_PER_PRODUCT,
 } from "../../constants/index.js";
-import { imagesAtom, objectIdAtom, slugAtom } from "./catalog.atoms.js";
+import {
+  imagesArrayAtom,
+  imagesAtom,
+  objectIdAtom,
+  slugAtom,
+} from "./catalog.atoms.js";
 
 // ---------------------------------------------------------------------------
 // CREATE
@@ -123,7 +128,7 @@ export const updateProductSchema = z.object({
 
       gstRate: z.union([z.literal(5), z.literal(12)]).optional(),
 
-      images: imagesAtom(MAX_IMAGES_PER_PRODUCT).optional(),
+      images: imagesArrayAtom(MAX_IMAGES_PER_PRODUCT).optional(),
 
       tags: z
         .array(z.string().trim().toLowerCase().min(1).max(MAX_TAG_LENGTH))
@@ -222,8 +227,25 @@ export const productListQuerySchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// PARAM-ONLY SCHEMAS
+// ---------------------------------------------------------------------------
+export const productIdParamSchema = z.object({
+  params: z.object({
+    id: objectIdAtom,
+  }),
+});
+
+export const productSlugParamSchema = z.object({
+  params: z.object({
+    slug: slugAtom,
+  }),
+});
+
+// ---------------------------------------------------------------------------
 // Inferred TypeScript types
 // ---------------------------------------------------------------------------
 export type CreateProductInput = z.infer<typeof createProductSchema>["body"];
 export type UpdateProductInput = z.infer<typeof updateProductSchema>["body"];
 export type ProductListQuery   = z.infer<typeof productListQuerySchema>["query"];
+export type ProductIdParam     = z.infer<typeof productIdParamSchema>["params"];
+export type ProductSlugParam   = z.infer<typeof productSlugParamSchema>["params"];

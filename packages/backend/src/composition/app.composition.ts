@@ -19,11 +19,15 @@ import {
   brandControllerCreator,
   BrandControllerInterface,
   createBrandRouter,
+  CategoryService,
+  categoryControllerCreator,
+  ICategoryControllerInterface,
+  createCategoryRouter,
+  ProductService,
+  productControllerCreator,
+  ProductControllerInterface,
+  createProductRouter,
 } from "../modules/catalog/index.js";
-import { CategoryService } from "../modules/catalog/services/category.service.js";
-import { ICategoryControllerInterface } from "../modules/catalog/interfaces/category.controller.interface.js";
-import { categoryControllerCreator } from "../modules/catalog/controllers/category.controller.js";
-import { createCategoryRouter } from "../modules/catalog/routes/category.routes.js";
 
 // ******** Identity Module ********
 // --- Services ---
@@ -49,17 +53,17 @@ export const authenticateMiddleware = createAuthMiddleware(tokenService, userSer
 
 
 // *********** Catalog Module**********
-// --- Services----
+// --- Brand ---
 const brandService = new BrandService();
-// --- Controllers ---
 export const brandController: BrandControllerInterface = brandControllerCreator(brandService);
-// --- Router ---
 export const brandRouter = createBrandRouter(brandController, authenticateMiddleware);
 
-
-// --- Services----
+// --- Category ---
 const categoryService = new CategoryService();
-// --- Controllers ---
 export const categoryController: ICategoryControllerInterface = categoryControllerCreator(categoryService);
-// --- Router ---
 export const categoryRouter = createCategoryRouter(categoryController, authenticateMiddleware);
+
+// --- Product ---
+const productService = new ProductService();
+export const productController: ProductControllerInterface = productControllerCreator(productService);
+export const productRouter = createProductRouter(productController, authenticateMiddleware);
