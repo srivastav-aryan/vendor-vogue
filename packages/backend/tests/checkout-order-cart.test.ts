@@ -242,6 +242,7 @@ describe("Internal Pieces: Cart Service, Order Snapshot Model & Checkout Intent 
 
       expect(order._id).toBeDefined();
       expect(order.status).toBe(ORDER_STATUS.PENDING_PAYMENT);
+      expect(order.items[0].vendorId).toBe("DEFAULT_VENDOR");
       expect(order.items[0].hsnCode).toBe("620520");
       expect(order.items[0].gstRate).toBe(5);
       expect(order.items[0].discountedUnitPrice).toBe(899);
@@ -409,6 +410,7 @@ describe("Internal Pieces: Cart Service, Order Snapshot Model & Checkout Intent 
       expect(order.status).toBe(ORDER_STATUS.PENDING_PAYMENT);
       expect(order.paymentStatus).toBe("PENDING");
       expect(order.items).toHaveLength(1);
+      expect(order.items[0].vendorId).toBe("Default Vendor");
       expect(order.finalPayableAmount).toBe(1998);
 
       // Verify atomic stock reservation: reservedQuantity should now be 2

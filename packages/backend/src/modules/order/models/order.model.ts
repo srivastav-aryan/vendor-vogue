@@ -28,6 +28,7 @@ export function isValidOrderStatusTransition(
 }
 
 export interface IOrderLineItem {
+  vendorId: string;
   variantId: mongoose.Types.ObjectId;
   productId: mongoose.Types.ObjectId;
   sku: string;
@@ -85,6 +86,12 @@ export interface IOrder extends Document {
 
 const OrderLineItemSchema = new Schema<IOrderLineItem>(
   {
+    vendorId: {
+      type: String,
+      required: true,
+      default: "DEFAULT_VENDOR",
+      trim: true,
+    },
     variantId: {
       type: Schema.Types.ObjectId,
       ref: "ProductVariant",
@@ -289,5 +296,6 @@ export const OrderSchema = new Schema<IOrder>(
 
 OrderSchema.index({ userId: 1, createdAt: -1 });
 OrderSchema.index({ createdAt: 1 });
+OrderSchema.index({ "items.vendorId": 1, status: 1 });
 
 export const Order = mongoose.model<IOrder>("Order", OrderSchema);

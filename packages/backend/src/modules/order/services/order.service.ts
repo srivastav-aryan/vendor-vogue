@@ -169,6 +169,7 @@ export class OrderService implements IOrderService {
         const product = productMap.get(evaluated.productId)!;
 
         return {
+          vendorId: (product as any).vendorId || "DEFAULT_VENDOR",
           variantId: variant._id,
           productId: product._id,
           sku: variant.sku,

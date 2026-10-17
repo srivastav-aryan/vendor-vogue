@@ -105,3 +105,22 @@ export const DEFAULT_PAGE_SIZE = 20;
 // Hard cap on page size. Without this, ?limit=999999 forces Mongoose to load
 // and serialize hundreds of thousands of documents — guaranteed OOM crash.
 export const MAX_PAGE_SIZE = 100;
+
+// ─── Cart & Order Constraints ───────────────────────────────────────────────
+
+export const MAX_CART_ITEM_QUANTITY = 50;
+
+/**
+ * Indian Pincode: 6 digits, first digit 1-9.
+ */
+export const INDIAN_PINCODE_REGEX = /^[1-9][0-9]{5}$/;
+
+/**
+ * Indian Mobile Phone: 10 digits starting with 6, 7, 8, or 9, optional +91 or 0 prefix.
+ */
+export const INDIAN_PHONE_REGEX = /^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/;
+
+/**
+ * Coupon Code: alphanumeric, hyphens, underscores, length 3 to 30.
+ */
+export const COUPON_CODE_REGEX = /^[A-Za-z0-9_\-]{3,30}$/;
