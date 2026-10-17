@@ -3,14 +3,13 @@ import {
   calculateInclusiveGst,
   determineApparelGstRate,
   roundToTwoDecimals,
-} from "../src/shared/utils/gst.utils.js";
+} from "../../src/shared/utils/gst.utils.js";
 
-describe("Unit Tests: Money & Indian GST Logic (Apparel HSN Chapters 61/62)", () => {
+describe("Unit: Indian GST & Money Calculations (HSN 61/62)", () => {
   describe("Apparel GST Rate Determination", () => {
     it("assigns 5% GST for transaction value <= 999 INR", () => {
       expect(determineApparelGstRate(500)).toBe(5);
       expect(determineApparelGstRate(999)).toBe(5);
-      expect(determineApparelGstRate(999.0)).toBe(5);
     });
 
     it("assigns 12% GST for transaction value >= 1000 INR", () => {
@@ -22,10 +21,6 @@ describe("Unit Tests: Money & Indian GST Logic (Apparel HSN Chapters 61/62)", ()
 
   describe("Inclusive GST Formula Calculation", () => {
     it("calculates exact inclusive 5% GST for a ₹999 shirt matching standard CA audit formula", () => {
-      // Selling price ₹999 at 5% GST
-      // gstAmount    = 999 * 5 / 105 = 47.5714... -> ₹47.57
-      // taxableAmount = 999 - 47.57  = ₹951.43
-      // Check: 951.43 * 1.05 = 999.0015 -> ₹999.00
       const result = calculateInclusiveGst(999, 1);
 
       expect(result.sellingPrice).toBe(999);
@@ -38,9 +33,6 @@ describe("Unit Tests: Money & Indian GST Logic (Apparel HSN Chapters 61/62)", ()
     });
 
     it("calculates exact inclusive 12% GST for a ₹1,200 shirt", () => {
-      // Selling price ₹1200 at 12% GST
-      // gstAmount    = 1200 * 12 / 112 = 128.5714... -> ₹128.57
-      // taxableAmount = 1200 - 128.57  = ₹1071.43
       const result = calculateInclusiveGst(1200, 1);
 
       expect(result.sellingPrice).toBe(1200);
@@ -53,16 +45,15 @@ describe("Unit Tests: Money & Indian GST Logic (Apparel HSN Chapters 61/62)", ()
     });
 
     it("multiplies quantity cleanly without floating-point accumulation drift", () => {
-      // 3 shirts at ₹899 each
       const result = calculateInclusiveGst(899, 3);
 
       expect(result.sellingPrice).toBe(899);
       expect(result.gstRate).toBe(5);
-      expect(result.gstAmount).toBe(42.81); // 899 * 5 / 105 = 42.8095 -> 42.81
-      expect(result.taxableAmount).toBe(856.19); // 899 - 42.81 = 856.19
-      expect(result.lineSubtotal).toBe(2697); // 899 * 3
-      expect(result.lineTaxTotal).toBe(128.43); // 42.81 * 3
-      expect(result.lineTaxableTotal).toBe(2568.57); // 856.19 * 3
+      expect(result.gstAmount).toBe(42.81);
+      expect(result.taxableAmount).toBe(856.19);
+      expect(result.lineSubtotal).toBe(2697);
+      expect(result.lineTaxTotal).toBe(128.43);
+      expect(result.lineTaxableTotal).toBe(2568.57);
       expect(roundToTwoDecimals(result.lineTaxableTotal + result.lineTaxTotal)).toBe(2697);
     });
 

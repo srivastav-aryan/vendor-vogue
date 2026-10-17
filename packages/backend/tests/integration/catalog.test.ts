@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import mongoose from "mongoose";
-import { VariantService } from "../src/modules/catalog/services/variant.service.js";
-import { ProductService } from "../src/modules/catalog/services/product.service.js";
-import { Brand } from "../src/modules/catalog/models/brand.model.js";
-import { Category } from "../src/modules/catalog/models/category.model.js";
-import { Product } from "../src/modules/catalog/models/product.model.js";
-import { ProductVariant } from "../src/modules/catalog/models/productVariant.model.js";
-import { CatalogError } from "../src/modules/catalog/errors/catalog.errors.js";
+import { VariantService } from "../../src/modules/catalog/services/variant.service.js";
+import { ProductService } from "../../src/modules/catalog/services/product.service.js";
+import { Brand } from "../../src/modules/catalog/models/brand.model.js";
+import { Category } from "../../src/modules/catalog/models/category.model.js";
+import { Product } from "../../src/modules/catalog/models/product.model.js";
+import { ProductVariant } from "../../src/modules/catalog/models/productVariant.model.js";
+import { CatalogError } from "../../src/modules/catalog/errors/catalog.errors.js";
 
-describe("Catalog Module - ProductVariant & Storefront Integration Tests", () => {
+describe("Integration: Catalog (Product & Variant Domain)", () => {
   const variantService = new VariantService();
   const productService = new ProductService();
 
@@ -17,7 +17,6 @@ describe("Catalog Module - ProductVariant & Storefront Integration Tests", () =>
   let testProductId: string;
 
   beforeEach(async () => {
-    // 1. Seed brand
     const brand = await Brand.create({
       name: "Acme Apparel",
       slug: "acme-apparel",
@@ -26,7 +25,6 @@ describe("Catalog Module - ProductVariant & Storefront Integration Tests", () =>
     });
     testBrandId = brand.id;
 
-    // 2. Seed category
     const category = await Category.create({
       name: "Shirts",
       slug: "shirts",
@@ -35,7 +33,6 @@ describe("Catalog Module - ProductVariant & Storefront Integration Tests", () =>
     });
     testCategoryId = category.id;
 
-    // 3. Seed product
     const product = await Product.create({
       name: "Classic Linen Shirt",
       slug: "classic-linen-shirt",
@@ -176,7 +173,7 @@ describe("Catalog Module - ProductVariant & Storefront Integration Tests", () =>
 
       await expect(
         variantService.updateVariant(created._id.toString(), {
-          sellingPrice: 1500, // exceeds mrp 1200
+          sellingPrice: 1500,
         }),
       ).rejects.toThrow(CatalogError);
     });
@@ -201,7 +198,6 @@ describe("Catalog Module - ProductVariant & Storefront Integration Tests", () =>
       expect(docInDb).not.toBeNull();
       expect(docInDb?.isActive).toBe(false);
 
-      // Verifies it is excluded from active listing
       const activeVariants = await variantService.getVariantsByProductId(testProductId);
       expect(activeVariants.some((v) => v.sku === "LN-BLK-XL")).toBe(false);
     });
@@ -239,7 +235,6 @@ describe("Catalog Module - ProductVariant & Storefront Integration Tests", () =>
       expect(result.product.brand.name).toBe("Acme Apparel");
       expect(result.product.category.name).toBe("Shirts");
 
-      // Only active variants should be returned for storefront
       expect(result.variants).toHaveLength(1);
       expect(result.variants[0].sku).toBe("LN-WHT-S");
       expect(result.variants[0].availableStock).toBe(12);

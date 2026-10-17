@@ -1,20 +1,20 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import mongoose from "mongoose";
-import { Cart } from "../src/modules/inventory/models/Cart.model.js";
-import { ProductVariant } from "../src/modules/catalog/models/productVariant.model.js";
-import { Product } from "../src/modules/catalog/models/product.model.js";
-import { Brand } from "../src/modules/catalog/models/brand.model.js";
-import { Category } from "../src/modules/catalog/models/category.model.js";
-import { PricingRule } from "../src/modules/pricing/models/pricingRule.model.js";
-import { CartReservation } from "../src/modules/inventory/models/cartReservation.model.js";
-import { InventoryEvent } from "../src/modules/inventory/models/inventoryEvent.model.js";
-import { Order, ORDER_STATUS } from "../src/modules/order/models/order.model.js";
-import { CartService } from "../src/modules/cart/services/cart.service.js";
-import { OrderService } from "../src/modules/order/services/order.service.js";
-import { PricingService } from "../src/modules/pricing/services/pricing.service.js";
-import { InventoryService } from "../src/modules/inventory/services/inventory.service.js";
-import { CartError } from "../src/modules/cart/errors/cart.errors.js";
-import { OrderError } from "../src/modules/order/errors/order.errors.js";
+import { Cart } from "../../src/modules/inventory/models/Cart.model.js";
+import { ProductVariant } from "../../src/modules/catalog/models/productVariant.model.js";
+import { Product } from "../../src/modules/catalog/models/product.model.js";
+import { Brand } from "../../src/modules/catalog/models/brand.model.js";
+import { Category } from "../../src/modules/catalog/models/category.model.js";
+import { PricingRule } from "../../src/modules/pricing/models/pricingRule.model.js";
+import { CartReservation } from "../../src/modules/inventory/models/cartReservation.model.js";
+import { InventoryEvent } from "../../src/modules/inventory/models/inventoryEvent.model.js";
+import { Order, ORDER_STATUS } from "../../src/modules/order/models/order.model.js";
+import { CartService } from "../../src/modules/cart/services/cart.service.js";
+import { OrderService } from "../../src/modules/order/services/order.service.js";
+import { PricingService } from "../../src/modules/pricing/services/pricing.service.js";
+import { InventoryService } from "../../src/modules/inventory/services/inventory.service.js";
+import { CartError } from "../../src/modules/cart/errors/cart.errors.js";
+import { OrderError } from "../../src/modules/order/errors/order.errors.js";
 
 describe("Internal Pieces: Cart Service, Order Snapshot Model & Checkout Intent Orchestrator", () => {
   const pricingService = new PricingService();

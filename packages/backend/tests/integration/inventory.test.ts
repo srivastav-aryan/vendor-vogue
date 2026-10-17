@@ -1,15 +1,15 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import mongoose from "mongoose";
-import { InventoryService } from "../src/modules/inventory/services/inventory.service.js";
-import { ProductVariant } from "../src/modules/catalog/models/productVariant.model.js";
-import { Product } from "../src/modules/catalog/models/product.model.js";
-import { Brand } from "../src/modules/catalog/models/brand.model.js";
-import { Category } from "../src/modules/catalog/models/category.model.js";
-import { CartReservation } from "../src/modules/inventory/models/cartReservation.model.js";
-import { InventoryEvent } from "../src/modules/inventory/models/inventoryEvent.model.js";
-import { InventoryError } from "../src/modules/inventory/errors/inventory.errors.js";
+import { InventoryService } from "../../src/modules/inventory/services/inventory.service.js";
+import { ProductVariant } from "../../src/modules/catalog/models/productVariant.model.js";
+import { Product } from "../../src/modules/catalog/models/product.model.js";
+import { Brand } from "../../src/modules/catalog/models/brand.model.js";
+import { Category } from "../../src/modules/catalog/models/category.model.js";
+import { CartReservation } from "../../src/modules/inventory/models/cartReservation.model.js";
+import { InventoryEvent } from "../../src/modules/inventory/models/inventoryEvent.model.js";
+import { InventoryError } from "../../src/modules/inventory/errors/inventory.errors.js";
 
-describe("Feature 1 — Inventory Integrity System Integration Tests", () => {
+describe("Integration: Inventory Integrity System", () => {
   const inventoryService = new InventoryService();
 
   let testVariantId: string;
@@ -85,16 +85,13 @@ describe("Feature 1 — Inventory Integrity System Integration Tests", () => {
       expect(reservation).toBeDefined();
       expect(reservation.reservedQuantity).toBe(1);
 
-      // Verify variant updated atomically
       const variant = await ProductVariant.findById(testVariantId);
       expect(variant?.stockQuantity).toBe(1);
       expect(variant?.reservedQuantity).toBe(1);
 
-      // Available stock is now 0
       const available = await inventoryService.getAvailableStock(testVariantId);
       expect(available).toBe(0);
 
-      // Verify audit event was recorded
       const event = await InventoryEvent.findOne({
         productVariantId: testVariantId,
         eventType: "RESERVATION_CREATED",
@@ -104,7 +101,6 @@ describe("Feature 1 — Inventory Integrity System Integration Tests", () => {
     });
 
     it("two concurrent buyers attempting to reserve the last 1 item: only one succeeds, other fails", async () => {
-      // Fire both reservations simultaneously
       const results = await Promise.allSettled([
         inventoryService.reserveStock({
           userId: testUserIdA,
@@ -128,7 +124,6 @@ describe("Feature 1 — Inventory Integrity System Integration Tests", () => {
       expect(rejectedError).toBeInstanceOf(InventoryError);
       expect(rejectedError.code).toBe("INSUFFICIENT_STOCK");
 
-      // Verify DB state remains integral: 1 reserved, 0 available, NO overselling
       const variant = await ProductVariant.findById(testVariantId);
       expect(variant?.stockQuantity).toBe(1);
       expect(variant?.reservedQuantity).toBe(1);
@@ -139,7 +134,7 @@ describe("Feature 1 — Inventory Integrity System Integration Tests", () => {
         inventoryService.reserveStock({
           userId: testUserIdA,
           variantId: testVariantId,
-          quantity: 5, // Only 1 exists
+          quantity: 5,
         }),
       ).rejects.toThrow(InventoryError);
     });
@@ -147,7 +142,6 @@ describe("Feature 1 — Inventory Integrity System Integration Tests", () => {
 
   describe("Reservation Expiry & Rollback", () => {
     it("releases reserved stock when customer cancels or abandons, returning stock to the pool", async () => {
-      // 1. Reserve 1 unit
       await inventoryService.reserveStock({
         userId: testUserIdA,
         variantId: testVariantId,
@@ -156,14 +150,12 @@ describe("Feature 1 — Inventory Integrity System Integration Tests", () => {
 
       expect(await inventoryService.getAvailableStock(testVariantId)).toBe(0);
 
-      // 2. Release reservation
       await inventoryService.releaseReservation({
         userId: testUserIdA,
         variantId: testVariantId,
         reason: "Customer cancelled checkout",
       });
 
-      // 3. Verify stock returned
       const available = await inventoryService.getAvailableStock(testVariantId);
       expect(available).toBe(1);
 
@@ -173,7 +165,6 @@ describe("Feature 1 — Inventory Integrity System Integration Tests", () => {
       });
       expect(reservationDoc).toBeNull();
 
-      // 4. Verify release audit event recorded
       const releaseEvent = await InventoryEvent.findOne({
         productVariantId: testVariantId,
         eventType: "RESERVATION_EXPIRED",
@@ -187,14 +178,12 @@ describe("Feature 1 — Inventory Integrity System Integration Tests", () => {
     it("commits sale after successful payment, decrementing both physical stock and reservedQuantity", async () => {
       const orderId = new mongoose.Types.ObjectId().toString();
 
-      // 1. Reserve at checkout intent
       await inventoryService.reserveStock({
         userId: testUserIdA,
         variantId: testVariantId,
         quantity: 1,
       });
 
-      // 2. Payment succeeds -> commit sale
       const saleEvent = await inventoryService.commitSale({
         variantId: testVariantId,
         quantity: 1,
@@ -207,12 +196,10 @@ describe("Feature 1 — Inventory Integrity System Integration Tests", () => {
       expect(saleEvent.ResultingStockQuantity).toBe(0);
       expect(saleEvent.ResultingReservedQuantity).toBe(0);
 
-      // 3. Verify variant physical stock is now 0 and reserved is 0
       const variant = await ProductVariant.findById(testVariantId);
       expect(variant?.stockQuantity).toBe(0);
       expect(variant?.reservedQuantity).toBe(0);
 
-      // 4. Cart reservation should be removed
       const reservation = await CartReservation.findOne({
         userId: testUserIdA,
         productVariantId: testVariantId,
@@ -223,14 +210,12 @@ describe("Feature 1 — Inventory Integrity System Integration Tests", () => {
     it("rejects commitSale when physical stock is 0", async () => {
       const orderId = new mongoose.Types.ObjectId().toString();
 
-      // Commit the single unit available
       await inventoryService.commitSale({
         variantId: testVariantId,
         quantity: 1,
         orderId,
       });
 
-      // Attempt second commit for the same item
       await expect(
         inventoryService.commitSale({
           variantId: testVariantId,
@@ -257,7 +242,6 @@ describe("Feature 1 — Inventory Integrity System Integration Tests", () => {
     });
 
     it("nightly integrity check detects discrepancies when stock diverges from ledger sum", async () => {
-      // Clean ledger: 1 restock (1) + 1 sale (-1) + 1 restock (+5) = 5
       const orderId = new mongoose.Types.ObjectId().toString();
       await inventoryService.commitSale({
         variantId: testVariantId,
@@ -269,17 +253,15 @@ describe("Feature 1 — Inventory Integrity System Integration Tests", () => {
         quantity: 5,
       });
 
-      // 1. Run check when ledger matches stockQuantity
       const cleanCheck = await inventoryService.runNightlyIntegrityCheck();
       expect(cleanCheck.discrepancies).toHaveLength(0);
 
-      // 2. Corrupt stockQuantity manually (simulating a direct bypass bug)
+      // Corrupt stockQuantity manually (simulating a direct bypass bug)
       await ProductVariant.updateOne(
         { _id: testVariantId },
         { $set: { stockQuantity: 99 } },
       );
 
-      // 3. Nightly check detects discrepancy
       const alertCheck = await inventoryService.runNightlyIntegrityCheck();
       expect(alertCheck.discrepancies).toHaveLength(1);
       expect(alertCheck.discrepancies[0].variantId).toBe(testVariantId);

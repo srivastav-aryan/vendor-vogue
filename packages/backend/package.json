@@ -7,8 +7,8 @@
   "scripts": {
     "lint": "echo 'Linting not set up yet'",
     "test": "vitest run",
-    "test:unit": "vitest run tests/gst-money.test.ts",
-    "test:integration": "vitest run tests/catalog-variant-storefront.test.ts tests/inventory-integrity.test.ts tests/pricing-rule-engine.test.ts tests/checkout-order-cart.test.ts",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
     "test:watch": "vitest",
     "start": "dist/server.js",
     "dev:node": "nodemon dist/server.js",

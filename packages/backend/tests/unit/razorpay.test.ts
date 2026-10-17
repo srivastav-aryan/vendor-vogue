@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 import crypto from "node:crypto";
-import { RazorpayPaymentService } from "../src/modules/payment/services/razorpay.service.js";
+import { RazorpayPaymentService } from "../../src/modules/payment/services/razorpay.service.js";
 
-describe("RazorpayPaymentService Unit Tests", () => {
+describe("Unit: Razorpay Gateway Adapter & Signatures", () => {
   const keyId = "rzp_test_sampleKey";
   const keySecret = "sampleSecretKey12345";
   const webhookSecret = "webhookSecretKey54321";
@@ -18,7 +18,6 @@ describe("RazorpayPaymentService Unit Tests", () => {
       const gatewayOrderId = "order_EKwxwAgIt42yEa";
       const paymentId = "pay_29QQoUBi66xm2f";
 
-      // Calculate the valid signature matching Razorpay formula: HMAC_SHA256(order_id + "|" + payment_id, secret)
       const validSignature = crypto
         .createHmac("sha256", keySecret)
         .update(`${gatewayOrderId}|${paymentId}`)
@@ -36,7 +35,8 @@ describe("RazorpayPaymentService Unit Tests", () => {
     it("rejects when signature has been tampered with", () => {
       const gatewayOrderId = "order_EKwxwAgIt42yEa";
       const paymentId = "pay_29QQoUBi66xm2f";
-      const tamperedSignature = "0000000000000000000000000000000000000000000000000000000000000000";
+      const tamperedSignature =
+        "0000000000000000000000000000000000000000000000000000000000000000";
 
       const isValid = paymentService.verifyPaymentSignature({
         gatewayOrderId,
@@ -47,7 +47,7 @@ describe("RazorpayPaymentService Unit Tests", () => {
       expect(isValid).toBe(false);
     });
 
-    it("safely rejects signatures with different lengths without crashing (timing attack resilience)", () => {
+    it("safely rejects signatures with different lengths without throwing (timing attack resilience)", () => {
       const isValid = paymentService.verifyPaymentSignature({
         gatewayOrderId: "order_123",
         paymentId: "pay_123",
@@ -62,7 +62,7 @@ describe("RazorpayPaymentService Unit Tests", () => {
     it("returns true for a genuine Razorpay webhook payload and signature", () => {
       const rawBody = JSON.stringify({
         entity: "event",
-        account_id: "acc_BF vulnerable",
+        account_id: "acc_test",
         event: "payment.captured",
         payload: { payment: { entity: { id: "pay_test_123" } } },
       });
@@ -89,7 +89,6 @@ describe("RazorpayPaymentService Unit Tests", () => {
         .update(rawBody)
         .digest("hex");
 
-      // Verify tampered payload against original signature fails
       const isValid = paymentService.verifyWebhookSignature(
         tamperedBody,
         validSignature,

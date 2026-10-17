@@ -1,22 +1,19 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import mongoose from "mongoose";
-import { PricingService } from "../src/modules/pricing/services/pricing.service.js";
-import { PricingRule } from "../src/modules/pricing/models/pricingRule.model.js";
-import { PricingError } from "../src/modules/pricing/errors/pricing.errors.js";
+import { PricingService } from "../../src/modules/pricing/services/pricing.service.js";
+import { PricingError } from "../../src/modules/pricing/errors/pricing.errors.js";
 
-describe("Pricing Rule Engine & GST Interaction Integration Tests", () => {
+describe("Integration: Pricing Rule Engine & GST Interaction", () => {
   const pricingService = new PricingService();
 
   let testCategoryId: string;
   let testBrandId: string;
   let testVariantIdA: string;
-  let testVariantIdB: string;
 
   beforeEach(() => {
     testCategoryId = new mongoose.Types.ObjectId().toString();
     testBrandId = new mongoose.Types.ObjectId().toString();
     testVariantIdA = new mongoose.Types.ObjectId().toString();
-    testVariantIdB = new mongoose.Types.ObjectId().toString();
   });
 
   describe("Rule Evaluation & Priority System", () => {
@@ -47,7 +44,6 @@ describe("Pricing Rule Engine & GST Interaction Integration Tests", () => {
         validTo,
       });
 
-      // Cart with 1 shirt at ₹1,200
       const evaluation = await pricingService.evaluatePricing([
         {
           variantId: testVariantIdA,
@@ -61,18 +57,15 @@ describe("Pricing Rule Engine & GST Interaction Integration Tests", () => {
       ]);
 
       expect(evaluation.cartSubtotal).toBe(1200);
-      // Winning rule is SUPER200 (priority 5 > priority 1) -> saves ₹200
       expect(evaluation.totalDiscount).toBe(200);
       expect(evaluation.finalPayableAmount).toBe(1000);
       expect(evaluation.appliedRuleCodes).toContain("SUPER200");
       expect(evaluation.items[0].appliedRuleCode).toBe("SUPER200");
       expect(evaluation.items[0].discountedUnitPrice).toBe(1000);
-
-      // Post-discount price is ₹1,000 => taxed at 12% GST
       expect(evaluation.items[0].gstRate).toBe(12);
     });
 
-    it("evaluates BOGO (Buy 1 Get 1 Free) applying 50% discount per unit when quantity >= 2", async () => {
+    it("evaluates BOGO applying 50% discount per unit when quantity >= 2", async () => {
       const now = new Date();
       await pricingService.createPricingRule({
         name: "BOGO Special",
@@ -97,13 +90,10 @@ describe("Pricing Rule Engine & GST Interaction Integration Tests", () => {
         },
       ]);
 
-      expect(evaluation.cartSubtotal).toBe(1600); // 800 * 2
-      // Each unit gets 50% off (effective buy one get one free) -> ₹400 off per unit * 2 = ₹800
+      expect(evaluation.cartSubtotal).toBe(1600);
       expect(evaluation.totalDiscount).toBe(800);
       expect(evaluation.finalPayableAmount).toBe(800);
       expect(evaluation.items[0].discountedUnitPrice).toBe(400);
-
-      // Transaction value is ₹400 per unit (<= 999) -> 5% GST
       expect(evaluation.items[0].gstRate).toBe(5);
     });
 
@@ -119,7 +109,6 @@ describe("Pricing Rule Engine & GST Interaction Integration Tests", () => {
         validTo: new Date(now.getTime() + 86400000),
       });
 
-      // Cart value only ₹1,200
       const evaluation = await pricingService.evaluatePricing([
         {
           variantId: testVariantIdA,
@@ -145,7 +134,7 @@ describe("Pricing Rule Engine & GST Interaction Integration Tests", () => {
         discountType: "PERCENTAGE",
         discountValue: 50,
         validFrom: new Date(now.getTime() - 100000),
-        validTo: new Date(now.getTime() - 50000), // In the past
+        validTo: new Date(now.getTime() - 50000),
       });
 
       await expect(
@@ -170,7 +159,6 @@ describe("Pricing Rule Engine & GST Interaction Integration Tests", () => {
   describe("GST Threshold Shift on Discounted Transaction Value", () => {
     it("shifts GST bracket from 12% down to 5% when discount brings selling price from ₹1,200 to ₹899", async () => {
       const now = new Date();
-      // Flat ₹301 off
       await pricingService.createPricingRule({
         name: "Festive ₹301 Off",
         code: "DIWALI301",
@@ -180,7 +168,6 @@ describe("Pricing Rule Engine & GST Interaction Integration Tests", () => {
         validTo: new Date(now.getTime() + 86400000),
       });
 
-      // Original unit price: ₹1,200 (ordinarily 12% GST)
       const evaluation = await pricingService.evaluatePricing([
         {
           variantId: testVariantIdA,
@@ -193,9 +180,8 @@ describe("Pricing Rule Engine & GST Interaction Integration Tests", () => {
         },
       ]);
 
-      // Post discount: 1200 - 301 = ₹899
+      // Post discount: 1200 - 301 = ₹899 => 5% GST
       expect(evaluation.items[0].discountedUnitPrice).toBe(899);
-      // Indian Law: Transaction value <= ₹999 is taxed at 5%, NOT 12%
       expect(evaluation.items[0].gstRate).toBe(5);
       expect(evaluation.items[0].gstAmountPerUnit).toBe(42.81);
       expect(evaluation.items[0].taxableAmountPerUnit).toBe(856.19);
