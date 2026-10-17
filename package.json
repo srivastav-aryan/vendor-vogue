@@ -10,6 +10,10 @@
     "dev:backend-ts": "pnpm --filter backend dev:ts",
     "dev:user-front": "pnpm --filter user-frontend dev",
     "dev:shared": "pnpm --filter shared dev",
+    "test": "pnpm --filter backend test",
+    "test:unit": "pnpm --filter backend test:unit",
+    "test:integration": "pnpm --filter backend test:integration",
+    "test:e2e": "playwright test",
     "fullstakck-clean": "pnpm --recursive run clean",
     "backend-clean": "pnpm --filter backend clean",
     "shared-clean": "pnpm --filter shared clean"
