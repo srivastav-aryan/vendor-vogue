@@ -17,6 +17,9 @@ const processEnvSchema = z.object({
   LOGIN_WINDOW_MS: z.string().default("10000"),
   LOGIN_MAX_ATTEMPTS: z.string().default("5"),
   CORS_ORIGIN: z.string().default("http://localhost:5173"),
+  RAZORPAY_KEY_ID: z.string().default("rzp_test_placeholder"),
+  RAZORPAY_KEY_SECRET: z.string().default("rzp_secret_placeholder"),
+  RAZORPAY_WEBHOOK_SECRET: z.string().default("rzp_webhook_secret_placeholder"),
 });
 
 const result = processEnvSchema.safeParse(process.env);
