@@ -7,6 +7,7 @@ import {
   orderIdParamSchema,
   orderListQuerySchema,
   updateOrderStatusSchema,
+  verifyPaymentSchema,
 } from "@e-com/shared/schemas";
 
 export const createOrderRouter = (
@@ -15,13 +16,21 @@ export const createOrderRouter = (
 ): Router => {
   const router = Router();
 
-  // All order operations require authentication
+  // 1. Webhook endpoint (unauthenticated for users; authenticated cryptographically via Razorpay HMAC signature)
+  router.post("/webhook/razorpay", orderController.handleRazorpayWebhook);
+
+  // 2. All user operations require authentication
   router.use(authenticateMiddleware);
 
   router.post(
     "/checkout",
     validateReq(createCheckoutOrderSchema),
     orderController.createCheckoutOrder,
+  );
+  router.post(
+    "/payment/verify",
+    validateReq(verifyPaymentSchema),
+    orderController.verifyPayment,
   );
   router.get("/", validateReq(orderListQuerySchema), orderController.getUserOrders);
   router.get(

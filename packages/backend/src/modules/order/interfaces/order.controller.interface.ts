@@ -26,4 +26,14 @@ export interface IOrderController {
     res: Response,
     next: NextFunction,
   ): Promise<void>;
+  verifyPayment(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void>;
+  handleRazorpayWebhook(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void>;
 }

@@ -181,3 +181,26 @@ export type UpdateOrderStatusInputDto = z.infer<
 >["body"];
 export type CancelOrderInputDto = z.infer<typeof cancelOrderSchema>["body"];
 export type OrderIdParamDto = z.infer<typeof orderIdParamSchema>["params"];
+
+// ---------------------------------------------------------------------------
+// VERIFY PAYMENT SCHEMA (Razorpay)
+// ---------------------------------------------------------------------------
+export const verifyPaymentSchema = z.object({
+  body: z.object({
+    orderId: objectIdAtom,
+    razorpayOrderId: z
+      .string({ error: "Razorpay order ID is required" })
+      .trim()
+      .min(1, "Razorpay order ID cannot be empty"),
+    razorpayPaymentId: z
+      .string({ error: "Razorpay payment ID is required" })
+      .trim()
+      .min(1, "Razorpay payment ID cannot be empty"),
+    razorpaySignature: z
+      .string({ error: "Razorpay signature is required" })
+      .trim()
+      .min(1, "Razorpay signature cannot be empty"),
+  }),
+});
+
+export type VerifyPaymentInputDto = z.infer<typeof verifyPaymentSchema>["body"];

@@ -88,6 +88,9 @@ const setupMiddleWares = (app: express.Application): void => {
     express.json({
       limit: "10mb",
       type: "application/json",
+      verify: (req: Request, _res: Response, buf: Buffer) => {
+        req.rawBody = buf.toString("utf-8");
+      },
     }),
   );
 

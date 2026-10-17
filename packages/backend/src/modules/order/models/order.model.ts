@@ -75,6 +75,7 @@ export interface IOrder extends Document {
   appliedRuleCodes: string[];
   paymentStatus: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
   paymentProvider?: string;
+  gatewayOrderId?: string;
   paymentTransactionId?: string;
   reservationExpiresAt: Date;
   paidAt?: Date;
@@ -272,6 +273,10 @@ export const OrderSchema = new Schema<IOrder>(
       type: String,
       trim: true,
     },
+    gatewayOrderId: {
+      type: String,
+      trim: true,
+    },
     paymentTransactionId: {
       type: String,
       trim: true,
@@ -297,5 +302,6 @@ export const OrderSchema = new Schema<IOrder>(
 OrderSchema.index({ userId: 1, createdAt: -1 });
 OrderSchema.index({ createdAt: 1 });
 OrderSchema.index({ "items.vendorId": 1, status: 1 });
+OrderSchema.index({ gatewayOrderId: 1 }, { sparse: true });
 
 export const Order = mongoose.model<IOrder>("Order", OrderSchema);

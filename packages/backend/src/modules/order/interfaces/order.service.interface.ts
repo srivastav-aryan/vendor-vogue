@@ -30,6 +30,19 @@ export interface TransitionOrderStatusInput {
   reason?: string;
 }
 
+export interface VerifyOrderPaymentInput {
+  orderId: string;
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
+  userId?: string;
+}
+
+export interface HandleRazorpayWebhookInput {
+  rawBody: string;
+  signature: string;
+}
+
 export interface IOrderService {
   createCheckoutOrder(
     input: CreateCheckoutOrderInput,
@@ -61,4 +74,14 @@ export interface IOrderService {
     input: CancelOrderInput,
     ctx?: RequestContext,
   ): Promise<IOrder>;
+
+  verifyPayment(
+    input: VerifyOrderPaymentInput,
+    ctx?: RequestContext,
+  ): Promise<IOrder>;
+
+  handleRazorpayWebhook(
+    input: HandleRazorpayWebhookInput,
+    ctx?: RequestContext,
+  ): Promise<{ handled: boolean; orderId?: string }>;
 }

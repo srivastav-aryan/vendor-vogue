@@ -165,5 +165,68 @@ export const orderControllerCreator = (
         next(error);
       }
     },
+
+    async verifyPayment(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> {
+      try {
+        if (!req.user?._id) {
+          throw new ApiError(401, "Authentication required");
+        }
+
+        const { orderId, razorpayOrderId, razorpayPaymentId, razorpaySignature } =
+          req.body;
+
+        const order = await orderService.verifyPayment(
+          {
+            orderId,
+            razorpayOrderId,
+            razorpayPaymentId,
+            razorpaySignature,
+            userId: req.user._id.toString(),
+          },
+          getContext(req),
+        );
+
+        res.status(200).json({
+          success: true,
+          data: order,
+        });
+      } catch (error) {
+        next(error);
+      }
+    },
+
+    async handleRazorpayWebhook(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> {
+      try {
+        const signature = req.headers["x-razorpay-signature"] as string;
+        if (!signature) {
+          throw new ApiError(400, "Missing x-razorpay-signature header");
+        }
+
+        const rawBody = req.rawBody || JSON.stringify(req.body);
+
+        const result = await orderService.handleRazorpayWebhook(
+          {
+            rawBody,
+            signature,
+          },
+          getContext(req),
+        );
+
+        res.status(200).json({
+          status: "ok",
+          ...result,
+        });
+      } catch (error) {
+        next(error);
+      }
+    },
   };
 };

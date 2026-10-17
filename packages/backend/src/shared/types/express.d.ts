@@ -7,6 +7,7 @@ declare global {
     interface Request {
       id: string;
       log: pino.Logger;
+      rawBody?: string;
       user?: {
         _id: Types.ObjectId,
         email: string,

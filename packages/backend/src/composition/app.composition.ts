@@ -96,6 +96,14 @@ export const cartService: ICartService = new CartService(pricingService);
 export const cartController: ICartController = cartControllerCreator(cartService);
 export const cartRouter = createCartRouter(cartController, authenticateMiddleware);
 
+// *********** Payment Gateway Module **********
+import { RazorpayPaymentService } from "../modules/payment/index.js";
+export const paymentGatewayService = new RazorpayPaymentService(
+  env.RAZORPAY_KEY_ID,
+  env.RAZORPAY_KEY_SECRET,
+  env.RAZORPAY_WEBHOOK_SECRET,
+);
+
 // *********** Order Module **********
 import {
   OrderService,
@@ -107,6 +115,7 @@ import {
 export const orderService: IOrderService = new OrderService(
   pricingService,
   inventoryService,
+  paymentGatewayService,
 );
 export const orderController: IOrderController = orderControllerCreator(orderService);
 export const orderRouter = createOrderRouter(orderController, authenticateMiddleware);

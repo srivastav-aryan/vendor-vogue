@@ -14,19 +14,23 @@ import { IInventoryService } from "../../inventory/interfaces/inventory.service.
 import {
   CancelOrderInput,
   CreateCheckoutOrderInput,
+  HandleRazorpayWebhookInput,
   IOrderService,
   MarkOrderPaidInput,
   TransitionOrderStatusInput,
+  VerifyOrderPaymentInput,
 } from "../interfaces/order.service.interface.js";
 import { OrderError } from "../errors/order.errors.js";
 import { RequestContext } from "../../../shared/types/request-context.js";
 import { EvaluateCartItemInput } from "../../pricing/interfaces/pricing.service.interface.js";
 import { roundToTwoDecimals } from "../../../shared/utils/gst.utils.js";
+import { IPaymentGatewayService } from "../../payment/interfaces/payment.gateway.interface.js";
 
 export class OrderService implements IOrderService {
   constructor(
     private readonly pricingService: IPricingService,
     private readonly inventoryService: IInventoryService,
+    private readonly paymentGateway?: IPaymentGatewayService,
   ) {}
 
   /**
@@ -218,6 +222,33 @@ export class OrderService implements IOrderService {
         { session },
       );
 
+      // If a payment gateway is configured, register the gateway intent
+      if (this.paymentGateway) {
+        try {
+          const gatewayOrder = await this.paymentGateway.createPaymentOrder({
+            orderId: order._id.toString(),
+            amountInRupees: grandTotal,
+            notes: {
+              internalOrderId: order._id.toString(),
+              userId,
+            },
+          });
+          order.gatewayOrderId = gatewayOrder.gatewayOrderId;
+          order.paymentProvider = "RAZORPAY";
+          await order.save({ session });
+        } catch (gwErr) {
+          ctx?.logger?.error(
+            { err: gwErr, orderId: order._id },
+            "Failed to register order with Razorpay payment gateway",
+          );
+          throw new OrderError(
+            "PAYMENT_GATEWAY_ERROR",
+            "Payment gateway initialization failed. Please retry.",
+            502,
+          );
+        }
+      }
+
       // Clear the user's cart
       await Cart.findOneAndUpdate(
         { userId: new mongoose.Types.ObjectId(userId) },
@@ -228,7 +259,11 @@ export class OrderService implements IOrderService {
       await session.commitTransaction();
 
       ctx?.logger?.info(
-        { orderId: order._id, finalPayableAmount: grandTotal },
+        {
+          orderId: order._id,
+          finalPayableAmount: grandTotal,
+          gatewayOrderId: order.gatewayOrderId,
+        },
         "Checkout order created successfully in PENDING_PAYMENT status",
       );
 
@@ -329,6 +364,7 @@ export class OrderService implements IOrderService {
   /**
    * Marks an order as PAID upon payment gateway confirmation.
    * Commits inventory sales to the ledger inside a transaction.
+   * Fully atomic and idempotent to withstand duplicate deliveries and race conditions.
    */
   async markOrderAsPaid(
     input: MarkOrderPaidInput,
@@ -337,6 +373,15 @@ export class OrderService implements IOrderService {
     const { orderId, paymentProvider, paymentTransactionId } = input;
 
     const order = await this.getOrderById(orderId, undefined, ctx);
+
+    // Idempotency fast-path: If already paid, return safely with zero side effects
+    if (order.status === ORDER_STATUS.PAID) {
+      ctx?.logger?.info(
+        { orderId, paymentTransactionId },
+        "Order is already marked as PAID (Idempotent response)",
+      );
+      return order;
+    }
 
     if (order.status !== ORDER_STATUS.PENDING_PAYMENT) {
       throw new OrderError(
@@ -350,27 +395,48 @@ export class OrderService implements IOrderService {
     session.startTransaction();
 
     try {
+      // Atomic conditional update: acts as a distributed lock so only one concurrent request claims the transition
+      const updatedOrder = await Order.findOneAndUpdate(
+        {
+          _id: new mongoose.Types.ObjectId(orderId),
+          status: ORDER_STATUS.PENDING_PAYMENT,
+        },
+        {
+          $set: {
+            status: ORDER_STATUS.PAID,
+            paymentStatus: "COMPLETED",
+            paymentProvider,
+            paymentTransactionId,
+            paidAt: new Date(),
+          },
+        },
+        { new: true, session },
+      );
+
+      if (!updatedOrder) {
+        // Concurrently claimed by another verify or webhook worker
+        await session.abortTransaction();
+        ctx?.logger?.info(
+          { orderId },
+          "Concurrent payment confirmation detected, returning existing order state",
+        );
+        return this.getOrderById(orderId, undefined, ctx);
+      }
+
       // Commit inventory sale for each line item (deducts physical stock and clears reservation)
-      for (const item of order.items) {
+      for (const item of updatedOrder.items) {
         await this.inventoryService.commitSale(
           {
             variantId: item.variantId.toString(),
             quantity: item.quantity,
-            userId: order.userId.toString(),
-            orderId: order._id.toString(),
+            userId: updatedOrder.userId.toString(),
+            orderId: updatedOrder._id.toString(),
           },
           ctx,
           session,
         );
       }
 
-      order.status = ORDER_STATUS.PAID;
-      order.paymentStatus = "COMPLETED";
-      order.paymentProvider = paymentProvider;
-      order.paymentTransactionId = paymentTransactionId;
-      order.paidAt = new Date();
-
-      await order.save({ session });
       await session.commitTransaction();
 
       ctx?.logger?.info(
@@ -378,13 +444,156 @@ export class OrderService implements IOrderService {
         "Order marked as PAID and inventory committed",
       );
 
-      return order;
+      return updatedOrder;
     } catch (error) {
       await session.abortTransaction();
       throw error;
     } finally {
       await session.endSession();
     }
+  }
+
+  /**
+   * Verifies the cryptographic HMAC-SHA256 signature from the client checkout modal.
+   * If genuine, transitions the order to PAID idempotently.
+   */
+  async verifyPayment(
+    input: VerifyOrderPaymentInput,
+    ctx?: RequestContext,
+  ): Promise<IOrder> {
+    const {
+      orderId,
+      razorpayOrderId,
+      razorpayPaymentId,
+      razorpaySignature,
+      userId,
+    } = input;
+
+    if (!this.paymentGateway) {
+      throw new OrderError(
+        "PAYMENT_GATEWAY_NOT_CONFIGURED",
+        "Payment gateway is not configured",
+        500,
+      );
+    }
+
+    // Verify ownership and existence
+    const order = await this.getOrderById(orderId, userId, ctx);
+
+    // If order has an associated gateway order ID, ensure it matches
+    if (order.gatewayOrderId && order.gatewayOrderId !== razorpayOrderId) {
+      throw new OrderError(
+        "PAYMENT_MISMATCH",
+        "Razorpay order ID does not match order record",
+        400,
+      );
+    }
+
+    // Verify cryptographic signature
+    const isValid = this.paymentGateway.verifyPaymentSignature({
+      gatewayOrderId: razorpayOrderId,
+      paymentId: razorpayPaymentId,
+      signature: razorpaySignature,
+    });
+
+    if (!isValid) {
+      ctx?.logger?.warn(
+        { orderId, razorpayOrderId, razorpayPaymentId },
+        "Cryptographic payment signature verification failed",
+      );
+      throw new OrderError(
+        "INVALID_SIGNATURE",
+        "Payment verification failed: invalid signature",
+        400,
+      );
+    }
+
+    // Signature is genuine: transition order to PAID
+    return this.markOrderAsPaid(
+      {
+        orderId,
+        paymentProvider: "RAZORPAY",
+        paymentTransactionId: razorpayPaymentId,
+      },
+      ctx,
+    );
+  }
+
+  /**
+   * Processes incoming server-to-server Razorpay webhooks.
+   * Cryptographically verifies the raw payload signature and idempotently marks order as paid.
+   */
+  async handleRazorpayWebhook(
+    input: HandleRazorpayWebhookInput,
+    ctx?: RequestContext,
+  ): Promise<{ handled: boolean; orderId?: string }> {
+    const { rawBody, signature } = input;
+
+    if (!this.paymentGateway) {
+      throw new OrderError(
+        "PAYMENT_GATEWAY_NOT_CONFIGURED",
+        "Payment gateway is not configured",
+        500,
+      );
+    }
+
+    const isValid = this.paymentGateway.verifyWebhookSignature(
+      rawBody,
+      signature,
+    );
+    if (!isValid) {
+      ctx?.logger?.warn("Invalid Razorpay webhook signature");
+      throw new OrderError("INVALID_SIGNATURE", "Invalid webhook signature", 400);
+    }
+
+    let event: any;
+    try {
+      event = JSON.parse(rawBody);
+    } catch {
+      throw new OrderError(
+        "INVALID_PAYLOAD",
+        "Malformed webhook JSON payload",
+        400,
+      );
+    }
+
+    ctx?.logger?.info(
+      { eventType: event.event },
+      "Processing verified Razorpay webhook event",
+    );
+
+    // Handle payment success events (payment.captured or order.paid)
+    if (event.event === "payment.captured" || event.event === "order.paid") {
+      const paymentEntity = event.payload?.payment?.entity;
+      const gatewayOrderId = paymentEntity?.order_id;
+      const paymentId = paymentEntity?.id;
+
+      if (!gatewayOrderId || !paymentId) {
+        return { handled: false };
+      }
+
+      const order = await Order.findOne({ gatewayOrderId });
+      if (!order) {
+        ctx?.logger?.warn(
+          { gatewayOrderId },
+          "Webhook gateway order not found in database",
+        );
+        return { handled: false };
+      }
+
+      await this.markOrderAsPaid(
+        {
+          orderId: order._id.toString(),
+          paymentProvider: "RAZORPAY",
+          paymentTransactionId: paymentId,
+        },
+        ctx,
+      );
+
+      return { handled: true, orderId: order._id.toString() };
+    }
+
+    return { handled: false };
   }
 
   /**
