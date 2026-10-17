@@ -31,6 +31,7 @@ export const globalErrorHandler = (
     // for user errors
     statusCode = err.statusCode;
     message = err.message;
+    code = (err as any).code;
   } else if (err instanceof ZodError) {
     //for zodError
     statusCode = 400;

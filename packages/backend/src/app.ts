@@ -11,7 +11,9 @@ import cors from "cors";
 import {
   authRouter,
   brandRouter,
+  cartRouter,
   categoryRouter,
+  orderRouter,
   productRouter,
   variantRouter,
 } from "./composition/app.composition.js";
@@ -119,6 +121,10 @@ export const createApp = (): express.Application => {
   app.use("/api/catalog/categories", categoryRouter);
   app.use("/api/catalog/products", productRouter);
   app.use("/api/catalog/variants", variantRouter);
+
+  // Cart & Order endpoints
+  app.use("/api/cart", cartRouter);
+  app.use("/api/orders", orderRouter);
 
   //global error handler
   app.use(globalErrorHandler);

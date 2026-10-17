@@ -84,5 +84,32 @@ export const inventoryService = new InventoryService();
 import { PricingService } from "../modules/pricing/index.js";
 export const pricingService = new PricingService();
 
+// *********** Cart Module **********
+import {
+  CartService,
+  cartControllerCreator,
+  createCartRouter,
+  ICartController,
+  ICartService,
+} from "../modules/cart/index.js";
+export const cartService: ICartService = new CartService(pricingService);
+export const cartController: ICartController = cartControllerCreator(cartService);
+export const cartRouter = createCartRouter(cartController, authenticateMiddleware);
+
+// *********** Order Module **********
+import {
+  OrderService,
+  orderControllerCreator,
+  createOrderRouter,
+  IOrderController,
+  IOrderService,
+} from "../modules/order/index.js";
+export const orderService: IOrderService = new OrderService(
+  pricingService,
+  inventoryService,
+);
+export const orderController: IOrderController = orderControllerCreator(orderService);
+export const orderRouter = createOrderRouter(orderController, authenticateMiddleware);
+
 
 
