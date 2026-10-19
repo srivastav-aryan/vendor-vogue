@@ -98,5 +98,46 @@ export const categoryControllerCreator = (
         next(error);
       }
     },
+
+    updateCategory: async (
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ) => {
+      const ctx = createCtx(req, "update_category");
+      try {
+        const category = await categoryService.updateCategory(
+          req.params.id,
+          req.body,
+          ctx,
+        );
+
+        res.status(200).json({
+          success: true,
+          data: CategoryMapper.toResponse(category),
+          message: "Category updated successfully",
+        });
+      } catch (error) {
+        next(error);
+      }
+    },
+
+    deleteCategory: async (
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ) => {
+      const ctx = createCtx(req, "delete_category");
+      try {
+        await categoryService.deleteCategory(req.params.id, ctx);
+
+        res.status(200).json({
+          success: true,
+          message: "Category deleted successfully",
+        });
+      } catch (error) {
+        next(error);
+      }
+    },
   };
 };

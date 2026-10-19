@@ -1,4 +1,8 @@
-import { CategoryListQuery, CreateCategoryInput } from "@e-com/shared/schemas";
+import {
+  CategoryListQuery,
+  CreateCategoryInput,
+  UpdateCategoryInput,
+} from "@e-com/shared/schemas";
 import { RequestContext } from "../../../shared/types/request-context.js";
 import { PaginatedResult } from "../../../shared/utils/pagination.utils.js";
 import { LeanCategory } from "../models/category.model.js";
@@ -13,6 +17,14 @@ export interface ICategoryServices {
     input: CreateCategoryInput,
     ctx?: RequestContext,
   ): Promise<LeanCategory>;
+
+  updateCategory(
+    id: string,
+    input: UpdateCategoryInput,
+    ctx?: RequestContext,
+  ): Promise<LeanCategory>;
+
+  deleteCategory(id: string, ctx?: RequestContext): Promise<void>;
 
   getCategory(
     query: CategoryListQuery,

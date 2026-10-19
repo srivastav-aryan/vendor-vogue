@@ -3,9 +3,10 @@ import { authorize } from "../../../shared/middlewares/authorization.middleware.
 import { ICategoryControllerInterface } from "../interfaces/category.controller.interface.js";
 
 import {
-    categoryListNodeQuerySchema,
+  categoryListNodeQuerySchema,
   categoryListQuerySchema,
   createCategorySchema,
+  updateCategorySchema,
 } from "@e-com/shared/schemas";
 import express, { RequestHandler } from "express";
 import { validateReq } from "../../../shared/middlewares/validation.middleware.js";
@@ -53,6 +54,33 @@ export const createCategoryRouter = (
     authorize(PERMISSIONS.CATEGORIES_READ),
     validateReq(categoryListNodeQuerySchema),
     categoryController.getCategoryDetail,
+  );
+
+  // GET /api/catalog/categories/:id - Get category by ID
+  categoryRouter.get(
+    "/:id",
+    authenticate,
+    authorize(PERMISSIONS.CATEGORIES_READ),
+    validateReq(categoryListNodeQuerySchema),
+    categoryController.getCategoryDetail,
+  );
+
+  // PATCH /api/catalog/categories/:id - Update category
+  categoryRouter.patch(
+    "/:id",
+    authenticate,
+    authorize(PERMISSIONS.CATEGORIES_UPDATE),
+    validateReq(updateCategorySchema),
+    categoryController.updateCategory,
+  );
+
+  // DELETE /api/catalog/categories/:id - Delete category
+  categoryRouter.delete(
+    "/:id",
+    authenticate,
+    authorize(PERMISSIONS.CATEGORIES_DELETE),
+    validateReq(categoryListNodeQuerySchema),
+    categoryController.deleteCategory,
   );
 
   return categoryRouter;
