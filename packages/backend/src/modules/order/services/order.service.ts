@@ -14,9 +14,11 @@ import { IInventoryService } from "../../inventory/interfaces/inventory.service.
 import {
   CancelOrderInput,
   CreateCheckoutOrderInput,
+  GetUserOrdersInput,
   HandleRazorpayWebhookInput,
   IOrderService,
   MarkOrderPaidInput,
+  PaginatedOrdersResult,
   TransitionOrderStatusInput,
   VerifyOrderPaymentInput,
 } from "../interfaces/order.service.interface.js";
@@ -25,6 +27,10 @@ import { RequestContext } from "../../../shared/types/request-context.js";
 import { EvaluateCartItemInput } from "../../pricing/interfaces/pricing.service.interface.js";
 import { roundToTwoDecimals } from "../../../shared/utils/gst.utils.js";
 import { IPaymentGatewayService } from "../../payment/interfaces/payment.gateway.interface.js";
+import {
+  parsePagination,
+  buildPaginationMeta,
+} from "../../../shared/utils/pagination.utils.js";
 
 export class OrderService implements IOrderService {
   constructor(
@@ -310,16 +316,46 @@ export class OrderService implements IOrderService {
   }
 
   /**
-   * Retrieves all orders belonging to a specific user.
+   * Retrieves paginated orders belonging to a specific user or platform-wide (if admin).
    */
   async getUserOrders(
-    userId: string,
+    input: GetUserOrdersInput | string,
     ctx?: RequestContext,
-  ): Promise<IOrder[]> {
-    ctx?.logger?.info({ userId }, "Fetching user orders");
-    return Order.find({ userId: new mongoose.Types.ObjectId(userId) }).sort({
-      createdAt: -1,
-    });
+  ): Promise<PaginatedOrdersResult> {
+    const params: GetUserOrdersInput =
+      typeof input === "string" ? { userId: input } : input;
+
+    const { userId, status, page, limit } = params;
+    const { page: safePage, limit: safeLimit, skip } = parsePagination(
+      page,
+      limit,
+    );
+
+    const query: mongoose.FilterQuery<IOrder> = {};
+    if (userId) {
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        throw new OrderError("INVALID_USER_ID", "Invalid user ID format", 400);
+      }
+      query.userId = new mongoose.Types.ObjectId(userId);
+    }
+
+    if (status) {
+      query.status = status;
+    }
+
+    ctx?.logger?.info(
+      { userId, status, page: safePage, limit: safeLimit },
+      "Fetching paginated orders",
+    );
+
+    const [items, totalCount] = await Promise.all([
+      Order.find(query).sort({ createdAt: -1 }).skip(skip).limit(safeLimit),
+      Order.countDocuments(query),
+    ]);
+
+    const pagination = buildPaginationMeta(totalCount, safePage, safeLimit);
+
+    return { items, pagination };
   }
 
   /**

@@ -85,14 +85,27 @@ export const orderControllerCreator = (
           throw new ApiError(401, "Authentication required");
         }
 
-        const orders = await orderService.getUserOrders(
-          req.user._id.toString(),
+        const isAdmin = req.user.role === "ADMIN";
+        const queryParams = req.query as any;
+
+        const targetUserId = isAdmin
+          ? (queryParams?.userId as string | undefined)
+          : req.user._id.toString();
+
+        const result = await orderService.getUserOrders(
+          {
+            userId: targetUserId,
+            status: queryParams?.status,
+            page: queryParams?.page,
+            limit: queryParams?.limit,
+          },
           getContext(req),
         );
 
         res.status(200).json({
           success: true,
-          data: orders,
+          data: result.items,
+          pagination: result.pagination,
         });
       } catch (error) {
         next(error);

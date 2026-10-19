@@ -43,6 +43,18 @@ export interface HandleRazorpayWebhookInput {
   signature: string;
 }
 
+export interface GetUserOrdersInput {
+  userId?: string;
+  status?: OrderStatus;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedOrdersResult {
+  items: IOrder[];
+  pagination: import("../../../shared/utils/pagination.utils.js").PaginationMeta;
+}
+
 export interface IOrderService {
   createCheckoutOrder(
     input: CreateCheckoutOrderInput,
@@ -56,9 +68,9 @@ export interface IOrderService {
   ): Promise<IOrder>;
 
   getUserOrders(
-    userId: string,
+    input: GetUserOrdersInput | string,
     ctx?: RequestContext,
-  ): Promise<IOrder[]>;
+  ): Promise<PaginatedOrdersResult>;
 
   transitionOrderStatus(
     input: TransitionOrderStatusInput,

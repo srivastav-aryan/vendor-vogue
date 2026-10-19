@@ -22,6 +22,8 @@ export {
 export type {
   IOrderService,
   CreateCheckoutOrderInput,
+  GetUserOrdersInput,
+  PaginatedOrdersResult,
   MarkOrderPaidInput,
   CancelOrderInput,
   TransitionOrderStatusInput,
