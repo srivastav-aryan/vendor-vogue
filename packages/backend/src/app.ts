@@ -15,6 +15,7 @@ import {
   categoryRouter,
   orderRouter,
   productRouter,
+  uploadRouter,
   variantRouter,
 } from "./composition/app.composition.js";
 
@@ -128,6 +129,9 @@ export const createApp = (): express.Application => {
   // Cart & Order endpoints
   app.use("/api/cart", cartRouter);
   app.use("/api/orders", orderRouter);
+
+  // Upload signing endpoint (direct-to-cloud upload)
+  app.use("/api/upload", uploadRouter);
 
   //global error handler
   app.use(globalErrorHandler);

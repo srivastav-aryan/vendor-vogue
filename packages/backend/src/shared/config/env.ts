@@ -20,6 +20,10 @@ const processEnvSchema = z.object({
   RAZORPAY_KEY_ID: z.string().default("rzp_test_placeholder"),
   RAZORPAY_KEY_SECRET: z.string().default("rzp_secret_placeholder"),
   RAZORPAY_WEBHOOK_SECRET: z.string().default("rzp_webhook_secret_placeholder"),
+  CLOUDINARY_CLOUD_NAME: z.string().default("vendor-vogue-placeholder"),
+  CLOUDINARY_API_KEY: z.string().default("placeholder_api_key"),
+  CLOUDINARY_API_SECRET: z.string().default("placeholder_api_secret"),
+  CLOUDINARY_UPLOAD_FOLDER: z.string().default("vendor-vogue/products"),
 });
 
 const result = processEnvSchema.safeParse(process.env);

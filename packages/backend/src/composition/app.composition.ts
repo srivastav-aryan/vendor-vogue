@@ -125,5 +125,15 @@ export const orderRouter = createOrderRouter(orderController, authenticateMiddle
 export const reservationExpiryWorker: IReservationExpiryWorker =
   new ReservationExpiryWorker(orderService);
 
+// *********** Upload Module **********
+import {
+  UploadService,
+  uploadControllerCreator,
+  createUploadRouter,
+} from "../modules/upload/index.js";
+export const uploadService = new UploadService();
+export const uploadController = uploadControllerCreator(uploadService);
+export const uploadRouter = createUploadRouter(uploadController, authenticateMiddleware);
+
 
 
