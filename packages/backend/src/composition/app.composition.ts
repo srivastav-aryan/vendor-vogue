@@ -111,6 +111,8 @@ import {
   createOrderRouter,
   IOrderController,
   IOrderService,
+  ReservationExpiryWorker,
+  IReservationExpiryWorker,
 } from "../modules/order/index.js";
 export const orderService: IOrderService = new OrderService(
   pricingService,
@@ -119,6 +121,9 @@ export const orderService: IOrderService = new OrderService(
 );
 export const orderController: IOrderController = orderControllerCreator(orderService);
 export const orderRouter = createOrderRouter(orderController, authenticateMiddleware);
+
+export const reservationExpiryWorker: IReservationExpiryWorker =
+  new ReservationExpiryWorker(orderService);
 
 
 

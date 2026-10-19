@@ -27,3 +27,8 @@ export type {
   TransitionOrderStatusInput,
 } from "./interfaces/order.service.interface.js";
 export type { IOrderController } from "./interfaces/order.controller.interface.js";
+export { ReservationExpiryWorker } from "./workers/reservation-expiry.worker.js";
+export type {
+  IReservationExpiryWorker,
+  ProcessExpiredOrdersResult,
+} from "./interfaces/reservation-worker.interface.js";

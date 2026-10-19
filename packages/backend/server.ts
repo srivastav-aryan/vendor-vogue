@@ -4,11 +4,16 @@ import { connectDB } from "./src/shared/config/dbconfig.js";
 import { env } from "./src/shared/config/env.js";
 import { startGracefullShutdown } from "./src/shared/utils/applevel.utils.js";
 
+import { reservationExpiryWorker } from "./src/composition/app.composition.js";
+
 const startServer = async (): Promise<void> => {
   try {
     await connectDB();
 
     const app = createApp();
+
+    // Start background worker for reservation cleanup
+    reservationExpiryWorker.start();
 
     const server = app.listen(env.PORT, () => {
       console.log(`server started and listening on port: ${env.PORT}`);
@@ -19,11 +24,16 @@ const startServer = async (): Promise<void> => {
       }
     });
 
+    const shutdown = async (): Promise<void> => {
+      reservationExpiryWorker.stop();
+      await mongoose.disconnect();
+    };
+
     process.on("SIGTERM", () =>
-      startGracefullShutdown("SIGTERM", server, mongoose.disconnect)
+      startGracefullShutdown("SIGTERM", server, shutdown)
     );
     process.on("SIGINT", () =>
-      startGracefullShutdown("SIGINT", server, mongoose.disconnect)
+      startGracefullShutdown("SIGINT", server, shutdown)
     );
   } catch (error) {
     console.log(`Unable to start the server becasue of error:- ${error}`);
