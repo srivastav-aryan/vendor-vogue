@@ -21,6 +21,7 @@ export interface ReleaseReservationInput {
   userId: string;
   variantId: string;
   reason?: string;
+  quantity?: number;
 }
 
 export interface RestockInput {

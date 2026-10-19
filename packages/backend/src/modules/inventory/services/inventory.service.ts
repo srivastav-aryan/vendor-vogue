@@ -138,12 +138,12 @@ export class InventoryService implements IInventoryService {
       { session },
     );
 
-    if (!reservation) {
+    let qtyToRelease = reservation ? reservation.reservedQuantity : (input.quantity || 0);
+
+    if (qtyToRelease <= 0) {
       ctx?.logger?.info({ userId, variantId }, "No active reservation to release");
       return;
     }
-
-    const qtyToRelease = reservation.reservedQuantity;
 
     // Atomically decrement reservedQuantity
     const variant = await ProductVariant.findOneAndUpdate(
@@ -162,7 +162,7 @@ export class InventoryService implements IInventoryService {
             ResultingStockQuantity: variant.stockQuantity,
             ResultingReservedQuantity: Math.max(0, variant.reservedQuantity),
             reason,
-            refId: reservation._id as mongoose.Types.ObjectId,
+            refId: (reservation?._id as mongoose.Types.ObjectId) || undefined,
           },
         ],
         { session },

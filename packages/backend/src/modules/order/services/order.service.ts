@@ -627,6 +627,7 @@ export class OrderService implements IOrderService {
             {
               userId: order.userId.toString(),
               variantId: item.variantId.toString(),
+              quantity: item.quantity,
               reason: `Order cancelled: ${reason}`,
             },
             ctx,
