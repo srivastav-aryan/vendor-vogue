@@ -26,9 +26,17 @@ const setupMiddleWares = (app: express.Application): void => {
     }),
   );
 
+  const allowedOrigins = env.CORS_ORIGIN.split(",").map((o) => o.trim());
+
   app.use(
     cors({
-      origin: env.CORS_ORIGIN,
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error(`Origin ${origin} not allowed by CORS`));
+        }
+      },
       credentials: true,
       optionsSuccessStatus: 200,
     }),

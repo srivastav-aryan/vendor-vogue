@@ -30,5 +30,9 @@ export function isMongoDuplicateKeyError(
 
 /** Returns the first field name that collided (e.g. "slug", "name"). */
 export function getDuplicateKeyField(error: MongoDuplicateKeyError): string {
-  return Object.keys(error.keyPattern)[0] ?? "field";
+  const keys = Object.keys(error.keyPattern);
+  if (keys.length > 1 && keys[0] === "parent") {
+    return keys[1];
+  }
+  return keys[0] ?? "field";
 }
