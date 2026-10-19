@@ -20,6 +20,10 @@ dist/*
 dist-ssr
 *.local
 packages/*/dist/
+.next
+**/.next/
+*.tsbuildinfo
+**/*.tsbuildinfo
 
 # Editor directories and files
 .vscode/*

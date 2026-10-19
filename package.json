@@ -9,6 +9,7 @@
     "dev:backend-node": "pnpm --filter backend dev:node",
     "dev:backend-ts": "pnpm --filter backend dev:ts",
     "dev:user-front": "pnpm --filter user-frontend dev",
+    "dev:admin-front": "pnpm --filter admin-frontend dev",
     "dev:shared": "pnpm --filter shared dev",
     "test": "pnpm --filter backend test",
     "test:unit": "pnpm --filter backend test:unit",
