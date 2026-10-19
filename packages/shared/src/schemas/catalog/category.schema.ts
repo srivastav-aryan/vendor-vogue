@@ -46,6 +46,8 @@ export const updateCategorySchema = z.object({
         .optional(),
 
       isActive: z.boolean().optional(),
+
+      parent: objectIdAtom.nullable().optional(),
     })
     .refine((data) => Object.keys(data).length > 0, {
       message: "At least one field must be provided to update",
@@ -83,7 +85,7 @@ export const categoryListQuerySchema = z.object({
 
     search: z.string().optional(),
 
-    depth: z.enum(["root", "level1", "level2"]).optional().default("root"),
+    depth: z.enum(["root", "level1", "level2", "all"]).optional(),
 
     parent: objectIdAtom.optional(),
   }),
@@ -92,6 +94,8 @@ export const categoryListQuerySchema = z.object({
 export const categoryListNodeQuerySchema = z.object({
   params: z.object({ id: objectIdAtom }),
 });
+
+export const categoryIdParamSchema = categoryListNodeQuerySchema;
 
 // ---------------------------------------------------------------------------
 // Inferred TypeScript types

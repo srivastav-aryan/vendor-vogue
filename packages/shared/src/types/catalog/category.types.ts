@@ -20,4 +20,6 @@ export type CategoryTreeResponse = CategoryTreeNode;
 
 export type CategoryDetailResponse = CategoryResponse & {
   childrenCount: number;
+  parentDetail?: { id: string; name: string; slug: string; isActive: boolean } | null;
+  ancestorDetails?: { id: string; name: string; slug: string; isActive: boolean }[];
 };
