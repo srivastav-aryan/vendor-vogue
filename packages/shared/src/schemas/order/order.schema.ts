@@ -152,22 +152,33 @@ export const orderListQuerySchema = z.object({
   query: z
     .object({
       page: z
-        .string()
+        .union([z.string(), z.number()])
         .optional()
         .transform((val) => {
-          if (!val) return 1;
-          const parsed = parseInt(val, 10);
+          if (val === undefined || val === null) return 1;
+          const parsed = typeof val === "number" ? val : parseInt(val, 10);
           return isNaN(parsed) || parsed < 1 ? 1 : parsed;
         }),
       limit: z
-        .string()
+        .union([z.string(), z.number()])
         .optional()
         .transform((val) => {
-          if (!val) return DEFAULT_PAGE_SIZE;
-          const parsed = parseInt(val, 10);
+          if (val === undefined || val === null) return DEFAULT_PAGE_SIZE;
+          const parsed = typeof val === "number" ? val : parseInt(val, 10);
           if (isNaN(parsed) || parsed < 1) return DEFAULT_PAGE_SIZE;
           return Math.min(parsed, MAX_PAGE_SIZE);
         }),
+      status: z
+        .enum([
+          "PENDING_PAYMENT",
+          "PAID",
+          "PROCESSING",
+          "SHIPPED",
+          "DELIVERED",
+          "CANCELLED",
+        ])
+        .optional(),
+      userId: z.string().trim().optional(),
     })
     .optional(),
 });
