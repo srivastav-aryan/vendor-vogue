@@ -55,13 +55,25 @@ export function ProductDetailModal({
     setLoading(true);
     setError(null);
     try {
-      const res = await clientApiFetch<{ product: any; variants: any[] }>(
+      const res = await clientApiFetch<any>(
         `/api/catalog/products/${id}/storefront`
       );
       setData(res.data);
       setActiveImageIndex(0);
     } catch (err: any) {
-      setError(err.message || "Failed to load product details.");
+      console.warn("Storefront endpoint failed, trying direct product fallback:", err);
+      try {
+        const [prodRes, varsRes] = await Promise.all([
+          clientApiFetch<any>(`/api/catalog/products/${id}`),
+          clientApiFetch<any>(`/api/catalog/products/${id}/variants`).catch(() => ({ data: [] })),
+        ]);
+        const prod = prodRes.data;
+        const vars = Array.isArray(varsRes.data) ? varsRes.data : [];
+        setData({ ...prod, variants: vars });
+        setActiveImageIndex(0);
+      } catch (fallbackErr: any) {
+        setError(fallbackErr.message || err.message || "Failed to load product details.");
+      }
     } finally {
       setLoading(false);
     }
@@ -78,8 +90,13 @@ export function ProductDetailModal({
 
   if (!isOpen || !productId) return null;
 
-  const product = data?.product;
-  const variants = data?.variants || [];
+  const rawProduct = data && ("product" in data && data.product ? data.product : data);
+  const product = rawProduct && (rawProduct.id || rawProduct._id) ? rawProduct : null;
+  const variants: any[] = Array.isArray(data?.variants)
+    ? data.variants
+    : Array.isArray(rawProduct?.variants)
+    ? rawProduct.variants
+    : [];
   const images: string[] = Array.isArray(product?.images) ? product.images : [];
 
   const copySlug = () => {
@@ -206,6 +223,9 @@ export function ProductDetailModal({
                         })}
                         alt={product.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = images[activeImageIndex];
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center text-slate-300">
