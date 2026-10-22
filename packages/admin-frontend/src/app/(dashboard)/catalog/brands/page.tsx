@@ -10,7 +10,7 @@ export const metadata = {
 export default async function BrandsPage() {
   // Server-side data fetching with Next.js Tag-based caching
   const brandsRes = await serverApiFetch<BrandResponse[]>("/api/catalog/brands", {
-    params: { limit: 100 },
+    params: { limit: 100, isActive: "all" },
     next: {
       tags: ["catalog-brands"],
       revalidate: 60, // revalidate in background every 60s or on-demand via revalidateTag

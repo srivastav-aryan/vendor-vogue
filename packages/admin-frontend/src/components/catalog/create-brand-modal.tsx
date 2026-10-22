@@ -132,6 +132,17 @@ export function CreateBrandModal({
               placeholder="https://res.cloudinary.com/.../brand-logo.png"
               className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
             />
+            {logo && (
+              <div className="mt-2 flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-xl">
+                <img
+                  src={logo}
+                  alt="Logo preview"
+                  className="w-8 h-8 rounded object-contain bg-white border border-slate-200 p-0.5 shrink-0"
+                  onError={(e) => ((e.target as HTMLElement).style.display = "none")}
+                />
+                <span className="text-xs text-slate-500 truncate">Logo preview</span>
+              </div>
+            )}
           </div>
 
           <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
