@@ -51,6 +51,17 @@ export function ProductDetailModal({
   const [copiedSlug, setCopiedSlug] = useState(false);
   const [togglingVariantId, setTogglingVariantId] = useState<string | null>(null);
 
+  const normalizeData = (raw: any): { product: any; variants: any[] } | null => {
+    if (!raw) return null;
+    const prod = raw.product || raw;
+    const vars = Array.isArray(raw.variants)
+      ? raw.variants
+      : Array.isArray(prod.variants)
+      ? prod.variants
+      : [];
+    return { product: prod, variants: vars };
+  };
+
   const fetchDetail = async (id: string) => {
     setLoading(true);
     setError(null);
@@ -58,7 +69,7 @@ export function ProductDetailModal({
       const res = await clientApiFetch<any>(
         `/api/catalog/products/${id}/storefront`
       );
-      setData(res.data);
+      setData(normalizeData(res.data));
       setActiveImageIndex(0);
     } catch (err: any) {
       console.warn("Storefront endpoint failed, trying direct product fallback:", err);
@@ -69,7 +80,7 @@ export function ProductDetailModal({
         ]);
         const prod = prodRes.data;
         const vars = Array.isArray(varsRes.data) ? varsRes.data : [];
-        setData({ ...prod, variants: vars });
+        setData(normalizeData({ ...prod, variants: vars }));
         setActiveImageIndex(0);
       } catch (fallbackErr: any) {
         setError(fallbackErr.message || err.message || "Failed to load product details.");
@@ -90,13 +101,8 @@ export function ProductDetailModal({
 
   if (!isOpen || !productId) return null;
 
-  const rawProduct = data && ("product" in data && data.product ? data.product : data);
-  const product = rawProduct && (rawProduct.id || rawProduct._id) ? rawProduct : null;
-  const variants: any[] = Array.isArray(data?.variants)
-    ? data.variants
-    : Array.isArray(rawProduct?.variants)
-    ? rawProduct.variants
-    : [];
+  const product = data?.product && (data.product.id || data.product._id) ? data.product : null;
+  const variants: any[] = data?.variants || [];
   const images: string[] = Array.isArray(product?.images) ? product.images : [];
 
   const copySlug = () => {

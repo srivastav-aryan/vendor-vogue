@@ -27,6 +27,47 @@ interface ImageDropzoneProps {
   folder?: string;
 }
 
+/**
+ * Sniffs file MIME type or magic bytes to detect image formats
+ * even when files have no extension (e.g. "ff" or "jpg").
+ */
+async function isLikelyImage(file: File): Promise<boolean> {
+  if (file.type && file.type.startsWith("image/")) {
+    return true;
+  }
+  if (/\.(jpe?g|png|webp|avif|gif|svg)$/i.test(file.name)) {
+    return true;
+  }
+  try {
+    const slice = file.slice(0, 16);
+    const buffer = await slice.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    if (bytes.length < 4) return false;
+    // JPEG: FF D8 FF
+    if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return true;
+    // PNG: 89 50 4E 47
+    if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return true;
+    // GIF: 47 49 46 38
+    if (bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x38) return true;
+    // WEBP: RIFF....WEBP
+    if (
+      bytes[0] === 0x52 &&
+      bytes[1] === 0x49 &&
+      bytes[2] === 0x46 &&
+      bytes[3] === 0x46 &&
+      bytes[8] === 0x57 &&
+      bytes[9] === 0x45 &&
+      bytes[10] === 0x42 &&
+      bytes[11] === 0x50
+    ) {
+      return true;
+    }
+  } catch {
+    // Ignore and fallback
+  }
+  return false;
+}
+
 export function ImageDropzone({
   value = [],
   onChange,
@@ -41,20 +82,30 @@ export function ImageDropzone({
   const [urlInput, setUrlInput] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const processUpload = async (files: File[]) => {
-    if (files.length === 0) return;
+  const processUpload = async (rawFiles: File[]) => {
+    if (rawFiles.length === 0) return;
 
-    if (value.length + files.length > maxImages) {
+    if (value.length + rawFiles.length > maxImages) {
       setError(`Maximum limit reached: You can only upload up to ${maxImages} images.`);
       return;
     }
 
-    // Validate size (max 10MB per image)
-    for (const file of files) {
+    // Validate size (max 10MB per image) and image format
+    const validatedFiles: { file: File; uploadName: string }[] = [];
+    for (const file of rawFiles) {
       if (file.size > 10 * 1024 * 1024) {
         setError(`File "${file.name}" exceeds the 10MB size limit. Please choose a smaller image.`);
         return;
       }
+      const isImg = await isLikelyImage(file);
+      if (!isImg) {
+        setError(`File "${file.name}" is not a recognized image format. Please select JPEG, PNG, or WebP.`);
+        return;
+      }
+      // Ensure file has an image extension for Cloudinary MIME detection
+      const hasExt = /\.(jpe?g|png|webp|avif|gif)$/i.test(file.name);
+      const uploadName = hasExt ? file.name : `${file.name}.jpg`;
+      validatedFiles.push({ file, uploadName });
     }
 
     setError(null);
@@ -77,12 +128,12 @@ export function ImageDropzone({
       const uploadedUrls: string[] = [];
 
       // 2. Upload directly to Cloudinary CDN from the browser
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        setUploadProgress(`Uploading ${i + 1} of ${files.length} (${file.name}) to CDN...`);
+      for (let i = 0; i < validatedFiles.length; i++) {
+        const { file, uploadName } = validatedFiles[i];
+        setUploadProgress(`Uploading ${i + 1} of ${validatedFiles.length} (${file.name}) to CDN...`);
 
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("file", file, uploadName);
         formData.append("api_key", cleanApiKey);
         formData.append("timestamp", String(timestamp));
         formData.append("signature", signature.trim());
@@ -140,9 +191,7 @@ export function ImageDropzone({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const files = Array.from(e.dataTransfer.files || []).filter(
-      (f) => f.type.startsWith("image/") || /\.(jpe?g|png|webp|avif|gif)$/i.test(f.name)
-    );
+    const files = Array.from(e.dataTransfer.files || []);
     if (files.length > 0) {
       processUpload(files);
     }
@@ -251,11 +300,10 @@ export function ImageDropzone({
         )}
       </div>
 
-      {/* Hidden File Input accepting all standard apparel image formats */}
+      {/* Hidden File Input allowing all files so OS dialog (Linux Nautilus) displays extensionless images */}
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*,.jpg,.jpeg,.png,.webp,.avif,.gif"
         multiple={maxImages - value.length > 1}
         className="hidden"
         onChange={handleFileSelect}

@@ -48,6 +48,7 @@ export function ProductList({
   const [selectedProductForEdit, setSelectedProductForEdit] = useState<any | null>(null);
   const [selectedProductForDelete, setSelectedProductForDelete] = useState<any | null>(null);
   const [selectedProductIdForVariant, setSelectedProductIdForVariant] = useState<string | null>(null);
+  const [detailRefreshKey, setDetailRefreshKey] = useState(0);
 
   const fetchProducts = async () => {
     setIsRefreshing(true);
@@ -388,6 +389,7 @@ export function ProductList({
 
       {/* Product Detail & Variant Inspector Modal */}
       <ProductDetailModal
+        key={selectedProductForDetail ? `${selectedProductForDetail}-${detailRefreshKey}` : "none"}
         isOpen={Boolean(selectedProductForDetail)}
         productId={selectedProductForDetail}
         onClose={() => setSelectedProductForDetail(null)}
@@ -422,10 +424,7 @@ export function ProductList({
         productId={selectedProductIdForVariant}
         onClose={() => setSelectedProductIdForVariant(null)}
         onVariantAdded={() => {
-          // Re-trigger product detail refresh if open
-          if (selectedProductForDetail) {
-            setSelectedProductForDetail((prev: any) => prev);
-          }
+          setDetailRefreshKey((k) => k + 1);
           fetchProducts();
         }}
       />
