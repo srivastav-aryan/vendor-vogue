@@ -86,5 +86,9 @@ export async function clientApiFetch<T>(
     throw new Error(errorMessage);
   }
 
+  if (res.status === 204) {
+    return { success: true, data: undefined as unknown as T };
+  }
+
   return res.json();
 }
