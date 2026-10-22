@@ -74,6 +74,7 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
       setCategories(items);
     } catch (err: any) {
       console.warn("Client categories fetch:", err);
+      setActionError(err.message || "Failed to load categories from database.");
     } finally {
       setIsLoading(false);
     }
@@ -92,6 +93,7 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
       }
     } catch (err: any) {
       console.warn("Failed to load category tree endpoint:", err);
+      setActionError(err.message || "Failed to load category tree from database.");
     } finally {
       setIsTreeLoading(false);
     }
@@ -103,6 +105,13 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
       loadCategoriesFromApi();
     }
   }, []);
+
+  // Synchronize state when initialCategories updates
+  useEffect(() => {
+    if (initialCategories && initialCategories.length > 0) {
+      setCategories(initialCategories);
+    }
+  }, [initialCategories]);
 
   // When switching to tree mode, fetch the hierarchical tree endpoint
   useEffect(() => {
