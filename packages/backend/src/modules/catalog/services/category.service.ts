@@ -45,6 +45,9 @@ export class CategoryService implements ICategoryServices {
           name: input.name,
           slug,
           description: input.description,
+          parent: null,
+          ancestors: [],
+          isActive: true,
         });
 
         ctx?.logger.info({ categoryId: category.id }, "Category created");
@@ -330,7 +333,9 @@ export class CategoryService implements ICategoryServices {
             };
           }
 
-          for (const ancestorId of doc.ancestors) {
+          const ancestors = doc.ancestors || [];
+          for (const ancestorId of ancestors) {
+            if (!ancestorId) continue;
             const ancestorDoc = categoryMap.get(ancestorId.toString());
 
             if (!ancestorDoc || !ancestorDoc.isActive) {
@@ -393,7 +398,9 @@ export class CategoryService implements ICategoryServices {
             };
           }
 
-          for (const ancestorId of doc.ancestors) {
+          const ancestors = doc.ancestors || [];
+          for (const ancestorId of ancestors) {
+            if (!ancestorId) continue;
             const ancestorDoc = categoryMap.get(ancestorId.toString());
 
             if (!ancestorDoc || !ancestorDoc.isActive) {
@@ -445,11 +452,11 @@ export class CategoryService implements ICategoryServices {
 
       // 3. Depth Filter
       if (depth === "root") {
-        filteredData = filteredData.filter((cat) => cat.ancestors.length === 0);
+        filteredData = filteredData.filter((cat) => (cat.ancestors || []).length === 0);
       } else if (depth === "level1") {
-        filteredData = filteredData.filter((cat) => cat.ancestors.length === 1);
+        filteredData = filteredData.filter((cat) => (cat.ancestors || []).length === 1);
       } else if (depth === "level2") {
-        filteredData = filteredData.filter((cat) => cat.ancestors.length === 2);
+        filteredData = filteredData.filter((cat) => (cat.ancestors || []).length === 2);
       }
       ctx?.logger.info(
         { count: filteredData.length, depth },
@@ -529,7 +536,9 @@ export class CategoryService implements ICategoryServices {
             };
           }
 
-          for (const ancestorId of doc.ancestors) {
+          const ancestors = doc.ancestors || [];
+          for (const ancestorId of ancestors) {
+            if (!ancestorId) continue;
             const ancestorDoc = categoryMap.get(ancestorId.toString());
 
             if (!ancestorDoc || !ancestorDoc.isActive) {
@@ -576,15 +585,15 @@ export class CategoryService implements ICategoryServices {
         const matchedOrAncestorIds = new Set<string>();
         for (const hit of searchHits) {
           matchedOrAncestorIds.add(hit._id.toString());
-          for (const ancId of hit.ancestors) {
-            matchedOrAncestorIds.add(ancId.toString());
+          for (const ancId of (hit.ancestors || [])) {
+            if (ancId) matchedOrAncestorIds.add(ancId.toString());
           }
         }
 
         filteredCategories = filteredCategories.filter(
           (cat) =>
             matchedOrAncestorIds.has(cat._id.toString()) ||
-            cat.ancestors.some((id) => matchedCategoryIds.has(id.toString())),
+            (cat.ancestors || []).some((id) => id && matchedCategoryIds.has(id.toString())),
         );
 
         ctx?.logger.info(
@@ -601,8 +610,8 @@ export class CategoryService implements ICategoryServices {
         filteredCategories = filteredCategories.filter(
           (cat) =>
             cat._id.toString() === parent ||
-            cat.ancestors.some(
-              (ancestorId) => ancestorId.toString() === parent,
+            (cat.ancestors || []).some(
+              (ancestorId) => ancestorId && ancestorId.toString() === parent,
             ),
         );
         ctx?.logger.info(
@@ -685,8 +694,9 @@ export class CategoryService implements ICategoryServices {
 
       const childrenCount = await Category.countDocuments({ parent: id });
 
-      const blockingAncestor = categoryNode.ancestors.find(
-        (ancestor) => ancestor.isActive === false,
+      const ancestorsList = categoryNode.ancestors || [];
+      const blockingAncestor = ancestorsList.find(
+        (ancestor) => ancestor && ancestor.isActive === false,
       );
 
       let nodeWithStatus = categoryNode as any;

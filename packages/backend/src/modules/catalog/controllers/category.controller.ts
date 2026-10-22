@@ -52,10 +52,8 @@ export const categoryControllerCreator = (
 
         res.status(200).json({
           success: true,
-          data: {
-            items: result.items.map(CategoryMapper.toResponse),
-            pagination: result.pagination,
-          },
+          data: result.items.map(CategoryMapper.toResponse),
+          pagination: result.pagination,
         });
       } catch (error) {
         next(error);

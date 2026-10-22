@@ -17,41 +17,28 @@ export const createCategoryRouter = (
 ) => {
   const categoryRouter = express.Router();
 
-  // POST /api/catalog/categories - Create category
-  categoryRouter.post(
-    "/",
-    authenticate,
-    authorize(PERMISSIONS.CATEGORIES_CREATE),
-    validateReq(createCategorySchema),
-    categoryController.createCategory,
-  );
+  // ---- Public routes (no auth required, matching brand and product catalog APIs) ----
 
   // GET /api/catalog/categories/storefront - Storefront / Navigation tree
   categoryRouter.get("/storefront", categoryController.getAllCategoryTree);
 
-  // GET /api/catalog/categories - Admin Tabular List View (paginated, filtered)
+  // GET /api/catalog/categories - Tabular List View (paginated, filtered)
   categoryRouter.get(
     "/",
-    authenticate,
-    authorize(PERMISSIONS.CATEGORIES_READ),
     validateReq(categoryListQuerySchema),
     categoryController.getCategoryTable,
   );
 
-  // GET /api/catalog/categories/tree - Admin Hierarchical Tree View
+  // GET /api/catalog/categories/tree - Hierarchical Tree View
   categoryRouter.get(
     "/tree",
-    authenticate,
-    authorize(PERMISSIONS.CATEGORIES_READ),
     validateReq(categoryListQuerySchema),
     categoryController.getCategoryTree,
   );
 
-  // GET /api/catalog/categories/treenode/:id - Admin single tree node detailed View
+  // GET /api/catalog/categories/treenode/:id - Single tree node detailed View
   categoryRouter.get(
     "/treenode/:id",
-    authenticate,
-    authorize(PERMISSIONS.CATEGORIES_READ),
     validateReq(categoryListNodeQuerySchema),
     categoryController.getCategoryDetail,
   );
@@ -59,10 +46,19 @@ export const createCategoryRouter = (
   // GET /api/catalog/categories/:id - Get category by ID
   categoryRouter.get(
     "/:id",
-    authenticate,
-    authorize(PERMISSIONS.CATEGORIES_READ),
     validateReq(categoryListNodeQuerySchema),
     categoryController.getCategoryDetail,
+  );
+
+  // ---- Protected routes (auth + permission required) ----
+
+  // POST /api/catalog/categories - Create category
+  categoryRouter.post(
+    "/",
+    authenticate,
+    authorize(PERMISSIONS.CATEGORIES_CREATE),
+    validateReq(createCategorySchema),
+    categoryController.createCategory,
   );
 
   // PATCH /api/catalog/categories/:id - Update category
