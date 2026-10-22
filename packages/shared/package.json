@@ -26,6 +26,10 @@
     "./authorization": {
       "types": "./dist/authorization/index.d.ts",
       "import": "./dist/authorization/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js"
     }
   },
   "keywords": [],

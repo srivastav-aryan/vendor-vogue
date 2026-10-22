@@ -52,7 +52,32 @@ export function ImageDropzone({
 
       const { signature, timestamp, apiKey, cloudName, folder: targetFolder } = signRes.data;
 
+      const isPlaceholder =
+        !cloudName ||
+        cloudName.includes("placeholder") ||
+        !apiKey ||
+        apiKey.includes("placeholder");
+
       const uploadedUrls: string[] = [];
+
+      // If in development and Cloudinary credentials have placeholder values,
+      // fallback to reading as local data URLs so product creation testing is not blocked.
+      if (isPlaceholder) {
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const dataUrl = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(file);
+          });
+          uploadedUrls.push(dataUrl);
+        }
+        setError(
+          "Notice: Using local preview because Cloudinary is running in demo/placeholder mode. To enable global CDN storage, paste your real Cloudinary keys in packages/backend/.env"
+        );
+        onChange([...value, ...uploadedUrls]);
+        return;
+      }
 
       // 2. Upload directly to Cloudinary CDN from the browser
       for (let i = 0; i < files.length; i++) {
