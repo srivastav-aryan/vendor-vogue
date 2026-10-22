@@ -16,7 +16,7 @@ export class UploadService {
    */
   generateSignature(folder?: string): UploadSignatureResult {
     const timestamp = Math.floor(Date.now() / 1000);
-    const targetFolder = folder || env.CLOUDINARY_UPLOAD_FOLDER || "vendor-vogue/products";
+    const targetFolder = (folder || env.CLOUDINARY_UPLOAD_FOLDER || "vendor-vogue/products").trim();
 
     // Cloudinary algorithm: parameters sorted alphabetically, joined as key=value&key=value, followed by api_secret
     const paramsToSign = `folder=${targetFolder}&timestamp=${timestamp}${env.CLOUDINARY_API_SECRET}`;
