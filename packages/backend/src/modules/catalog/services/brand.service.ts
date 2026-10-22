@@ -86,12 +86,18 @@ export class BrandService implements IBrandService {
     const { page, limit, skip } = parsePagination(query.page, query.limit);
 
     // query building for passing to the DB query
-    const filter: Record<string, any> = {
-      isActive: query.isActive,
-    };
+    const filter: Record<string, any> = {};
+
+    if (query.isActive !== undefined) {
+      filter.isActive = query.isActive;
+    }
 
     if (query.search) {
-      filter.name = { $regex: query.search, $options: "i" };
+      const safeSearch = query.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      filter.$or = [
+        { name: { $regex: safeSearch, $options: "i" } },
+        { slug: { $regex: safeSearch, $options: "i" } },
+      ];
     }
 
     const [totalCount, brands] = await Promise.all([

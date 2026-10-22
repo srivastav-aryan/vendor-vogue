@@ -148,10 +148,13 @@ export const brandListQuerySchema = z.object({
       ),
 
     isActive: z
-      .enum(["true", "false"])
+      .enum(["true", "false", "all"])
       .optional()
       .default("true")
-      .transform((val) => val === "true"),
+      .transform((val) => {
+        if (val === "all") return undefined;
+        return val === "true";
+      }),
 
     search: z.string().trim().max(200, "Search query too long").optional(),
   }),
