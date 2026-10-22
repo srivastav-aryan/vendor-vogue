@@ -214,12 +214,15 @@ export const productListQuerySchema = z.object({
       ),
 
     // Default: true — public product listings show only active products.
-    // Admin dashboards pass isActive=false explicitly to see deactivated items.
+    // Admin dashboards pass isActive="all" to see all products.
     isActive: z
-      .enum(["true", "false"])
+      .enum(["true", "false", "all"])
       .optional()
       .default("true")
-      .transform((val) => val === "true"),
+      .transform((val) => {
+        if (val === "all") return undefined;
+        return val === "true";
+      }),
 
     // Capped to prevent abuse of DB text search indexes with huge inputs.
     search: z.string().trim().max(200, "Search query too long").optional(),

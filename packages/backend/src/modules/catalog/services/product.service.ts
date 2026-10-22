@@ -205,7 +205,6 @@ export class ProductService implements IProductService {
 
     const variants = await ProductVariant.find({
       productId: product._id,
-      isActive: true,
     }).lean();
 
     const variantsWithAvailableStock = variants.map((v) => ({
@@ -247,7 +246,12 @@ export class ProductService implements IProductService {
     }
 
     if (query.search) {
-      filter.name = { $regex: query.search, $options: "i" };
+      const safeSearch = query.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      filter.$or = [
+        { name: { $regex: safeSearch, $options: "i" } },
+        { slug: { $regex: safeSearch, $options: "i" } },
+        { hsnCode: { $regex: safeSearch, $options: "i" } },
+      ];
     }
 
     const [totalCount, products] = await Promise.all([
