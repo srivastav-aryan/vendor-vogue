@@ -6,6 +6,7 @@ import { Hero } from "@/components/home/hero";
 import { BestsellerSection } from "@/components/home/bestseller-section";
 import { InfiniteMarquee } from "@/components/common/infinite-marquee";
 import { TrendingSection } from "@/components/home/trending-section";
+import { CampaignBannerVideo } from "@/components/home/campaign-banner-video";
 import type { NavigationItem } from "@e-com/shared/types";
 import { DEFAULT_NAV_ITEMS } from "@/lib/constants/navigation";
 import type { BestsellerProduct } from "@/lib/api/products";
@@ -41,6 +42,9 @@ export function StorefrontLanding({
 
         {/* Trending Product Section placed AFTER Marquee */}
         <TrendingSection initialProducts={initialTrending} />
+
+        {/* Cinematic Campaign Banner Video Strip directly below Trending Section */}
+        <CampaignBannerVideo />
       </main>
     </div>
   );
