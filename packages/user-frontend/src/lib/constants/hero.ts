@@ -55,17 +55,16 @@ export interface HeroConfig {
 export const HERO_CONFIG: HeroConfig = {
   mode: "image",
   imageSrc: "/images/hero/hero.jpg",
-  imageSrcTablet: "/images/hero/hero-mobile.jpg", // 1152x864 (4:3 tablet aspect)
-  imageSrcMobile: "/images/hero/hero-tablet.jpg", // 720x1280 (9:16 vertical portrait for mobile)
+  imageSrcTablet: "/images/hero/hero-tablet.jpg", // 1200x896 (landscape/4:3 tablet aspect)
+  imageSrcMobile: "/images/hero/hero-mobile.jpg", // 768x1376 (9:16 vertical portrait for mobile)
   videoSrc: "",
   posterSrc: "/images/hero/hero.jpg",
-  title: "VENDOR VOGUE",
-  subtitle: "AUTUMN / WINTER 2026 CAMPAIGN",
-  ctaText: "EXPLORE THE DROP",
+  title: "VENDOR\nVOGUE",
+  subtitle: "AUTUMN / WINTER 2026",
+  ctaText: "DISCOVER FW26 →",
   ctaHref: "/catalog",
   quickLinks: [
-    { label: "Featured", href: "/catalog?filter=featured" },
-    { label: "Mens", href: "/catalog/men" },
-    { label: "Womens", href: "/catalog/women" },
+    { label: "Men", href: "/catalog/men" },
+    { label: "Women", href: "/catalog/women" },
   ],
 };

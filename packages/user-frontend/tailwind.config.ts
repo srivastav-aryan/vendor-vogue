@@ -20,6 +20,7 @@ const config: Config = {
         sans: ["var(--font-sans)", "system-ui", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
         display: ["var(--font-display)", "var(--font-sans)", "system-ui", "sans-serif"],
         heading: ["var(--font-heading)", "var(--font-sans)", "system-ui", "sans-serif"],
+        serif: ["var(--font-serif)", "Didot", "Bodoni MT", "Playfair Display", "Times New Roman", "serif"],
         mono: ["var(--font-mono)", "monospace"],
       },
       letterSpacing: {

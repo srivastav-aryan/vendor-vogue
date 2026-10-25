@@ -20,124 +20,133 @@ export function Hero({
     ...config,
   };
 
-  const topSentinelRef = React.useRef<HTMLDivElement | null>(null);
-
   React.useEffect(() => {
-    if (!topSentinelRef.current || !onScrollThresholdChange) return;
+    if (!onScrollThresholdChange) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // When the top sentinel scrolls out of view, the user has scrolled down
-        onScrollThresholdChange(!entry.isIntersecting);
-      },
-      {
-        root: null,
-        threshold: 0,
-        rootMargin: "0px",
-      }
-    );
+    const handleScroll = () => {
+      // Trigger white header once scrolled past threshold
+      const isPast = window.scrollY > 40;
+      onScrollThresholdChange(isPast);
+    };
 
-    observer.observe(topSentinelRef.current);
-    return () => observer.disconnect();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [onScrollThresholdChange]);
 
   const isVideoMode = mergedConfig.mode === "video" && Boolean(mergedConfig.videoSrc);
 
   return (
-    <section className="relative w-full h-[100dvh] overflow-hidden bg-black select-none">
-      {/* Top Sentinel for instant, natural scroll transition */}
+    <section className="relative w-full h-[100dvh] min-h-[640px] overflow-hidden bg-[#070707] select-none">
+
+      {/* Background Campaign Visual */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden">
+        {isVideoMode ? (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster={mergedConfig.posterSrc || mergedConfig.imageSrc}
+            className="w-full h-full object-cover object-[center_30%] scale-100 transition-transform duration-1000 ease-out"
+          >
+            <source src={mergedConfig.videoSrc} type="video/mp4" />
+          </video>
+        ) : (
+          /* Native Art-Directed Responsive Picture:
+             Preserves model's face, clothing, jewelry, and background without awkward cropping */
+          <picture className="w-full h-full">
+            {mergedConfig.imageSrcMobile && (
+              <source
+                media="(max-width: 639px)"
+                srcSet={mergedConfig.imageSrcMobile}
+              />
+            )}
+            {mergedConfig.imageSrcTablet && (
+              <source
+                media="(max-width: 1023px)"
+                srcSet={mergedConfig.imageSrcTablet}
+              />
+            )}
+            <img
+              src={mergedConfig.imageSrc}
+              alt="Vendor Vogue Autumn/Winter 2026 Campaign"
+              fetchPriority="high"
+              decoding="async"
+              className="w-full h-full object-cover object-[center_28%] sm:object-[center_25%] md:object-center transition-transform duration-1000 ease-out will-change-transform"
+            />
+          </picture>
+        )}
+      </div>
+
+      {/* Cinematic Edge Vignette */}
       <div
-        ref={topSentinelRef}
-        className="absolute top-20 left-0 w-full h-1 pointer-events-none"
+        className="cinematic-vignette absolute inset-0 pointer-events-none z-10"
         aria-hidden="true"
       />
 
-      {/* Background Media */}
-      {isVideoMode ? (
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster={mergedConfig.posterSrc || mergedConfig.imageSrc}
-          className="absolute inset-0 w-full h-full object-cover object-center"
-        >
-          <source src={mergedConfig.videoSrc} type="video/mp4" />
-        </video>
-      ) : (
-        /* Native Art-Directed Responsive Picture:
-           Browser evaluates media queries natively to download ONLY the exact viewport asset,
-           preventing dual-downloads on mobile and eliminating layout shifts. */
-        <picture className="absolute inset-0 w-full h-full">
-          {mergedConfig.imageSrcMobile && (
-            <source
-              media="(max-width: 639px)"
-              srcSet={mergedConfig.imageSrcMobile}
-            />
-          )}
-          {mergedConfig.imageSrcTablet && (
-            <source
-              media="(max-width: 1023px)"
-              srcSet={mergedConfig.imageSrcTablet}
-            />
-          )}
-          <img
-            src={mergedConfig.imageSrc}
-            alt={mergedConfig.title || "Hero campaign visual"}
-            fetchPriority="high"
-            decoding="async"
-            className="w-full h-full object-cover object-center"
-          />
-        </picture>
-      )}
-
-      {/* Subtle top gradient vignette to guarantee header legibility over bright photography */}
+      {/* Subtle Top Gradient for Floating Navigation Legibility */}
       <div
-        className="absolute top-0 left-0 w-full h-44 bg-gradient-to-b from-black/75 via-black/35 to-transparent pointer-events-none z-10"
+        className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-black/55 via-black/20 to-transparent pointer-events-none z-10"
         aria-hidden="true"
       />
 
-      {/* Editorial Content Overlay */}
+      {/* Very Subtle Cinematic Black Gradient toward Bottom to anchor typography without dimming model */}
+      <div
+        className="hero-bottom-gradient absolute inset-x-0 bottom-0 h-3/5 pointer-events-none z-10"
+        aria-hidden="true"
+      />
+
+      {/* Fine Editorial Film Grain Overlay */}
+      <div
+        className="film-grain absolute inset-0 mix-blend-overlay opacity-60 pointer-events-none z-10"
+        aria-hidden="true"
+      />
+
+      {/* Main Editorial Hero Typography & Elements */}
       {showEditorialOverlay && (
-        <div className="absolute inset-x-0 bottom-0 z-20 px-6 sm:px-12 md:px-16 pb-10 sm:pb-14 pt-32 bg-gradient-to-t from-black/85 via-black/40 to-transparent flex flex-col items-center sm:items-start text-center sm:text-left text-white">
-          {mergedConfig.subtitle && (
-            <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-white/80 mb-2 sm:mb-3">
-              {mergedConfig.subtitle}
-            </p>
-          )}
+        <div className="relative z-20 h-full w-full flex flex-col justify-end px-6 sm:px-12 md:px-16 pb-12 sm:pb-14 md:pb-16 pointer-events-none">
+          <div className="w-full flex flex-col sm:flex-row items-start sm:items-end justify-between gap-8">
+            {/* Lower-Left Campaign Typography */}
+            <div className="max-w-2xl pointer-events-auto">
+              {/* Eyebrow */}
+              <p className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.28em] text-white/75 mb-3 sm:mb-4 animate-in fade-in duration-700">
+                AUTUMN / WINTER 2026
+              </p>
 
-          {mergedConfig.title && (
-            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black font-display tracking-tight uppercase mb-4 sm:mb-6 drop-shadow-md">
-              {mergedConfig.title}
-            </h1>
-          )}
+              {/* Oversized Headline */}
+              <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[7.25rem] font-black uppercase tracking-[-0.04em] leading-[0.85] text-white select-none drop-shadow-sm">
+                VENDOR
+                <br />
+                VOGUE
+              </h1>
 
-          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
-            {mergedConfig.ctaText && mergedConfig.ctaHref && (
-              <Link
-                href={mergedConfig.ctaHref}
-                className="inline-flex items-center justify-center px-7 sm:px-9 py-3 sm:py-3.5 text-xs sm:text-sm font-bold uppercase tracking-wider bg-white text-black hover:bg-neutral-200 transition-colors shadow-lg rounded-xs"
-              >
-                {mergedConfig.ctaText}
-              </Link>
-            )}
+              {/* Tagline */}
+              <p className="mt-4 sm:mt-5 text-xs sm:text-sm tracking-[0.25em] font-light text-white/80 uppercase">
+                THE NEW UNIFORM.
+              </p>
 
-            {mergedConfig.quickLinks && mergedConfig.quickLinks.length > 0 && (
-              <div className="hidden sm:flex items-center gap-2 text-xs uppercase tracking-wider font-semibold text-white/90">
-                <span className="opacity-50">Quick links:</span>
-                {mergedConfig.quickLinks.map((ql, idx) => (
-                  <React.Fragment key={ql.label}>
-                    {idx > 0 && <span className="opacity-40">/</span>}
-                    <Link
-                      href={ql.href}
-                      className="hover:text-white hover:underline underline-offset-4 transition-colors"
-                    >
-                      {ql.label}
-                    </Link>
-                  </React.Fragment>
-                ))}
+              {/* Minimal Transparent CTA with Thin White Border */}
+              <div className="mt-7 sm:mt-8">
+                <Link
+                  href={mergedConfig.ctaHref || "/catalog"}
+                  className="inline-flex items-center gap-3 border border-white/45 hover:border-white text-white bg-transparent hover:bg-white hover:text-black px-6 sm:px-8 py-3 sm:py-3.5 text-[11px] sm:text-xs uppercase tracking-[0.25em] font-medium transition-all duration-300 group"
+                >
+                  <span>DISCOVER FW26</span>
+                  <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+                </Link>
               </div>
-            )}
+            </div>
+
+            {/* Lower-Right Production Metadata */}
+            <div className="pointer-events-auto select-none text-left sm:text-right">
+              <div className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.26em] text-white/55 space-y-1 sm:space-y-1.5 leading-relaxed">
+                <p>FW26 — 01</p>
+                <p>CAMPAIGN / VENDOR VOGUE</p>
+                <p>MUMBAI / 2026</p>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -11,68 +11,90 @@ export interface EditorialMenuLink {
 
 export const EDITORIAL_QUICK_LINKS: EditorialMenuLink[] = [
   { label: "New Arrivals", href: "/catalog?sort=newest" },
-  { label: "Women's Exclusive", href: "/catalog/womens-exclusive" },
-  { label: "Most Wanted", href: "/catalog?filter=bestsellers" },
-  { label: "FW26 · 02", href: "/catalog/fw26-02", badge: "New" },
+  { label: "Best Sellers", href: "/catalog?filter=bestsellers" },
+  { label: "FW26 Campaign", href: "/catalog?collection=fw26", badge: "New" },
+  { label: "The Uniform", href: "/catalog?collection=the-uniform" },
 ];
 
 /**
- * Default Storefront Navigation tree matching @e-com/shared/types.
- * Used as fallback or initial seed before the dynamic /api/catalog/categories/storefront endpoint loads.
+ * Default Storefront Navigation tree matching the seeded backend database hierarchy:
+ * Roots: Men, Women, Kids
  */
 export const DEFAULT_NAV_ITEMS: NavigationItem[] = [
   {
-    id: "nav-shop",
-    label: "Shop",
-    href: "/catalog",
+    id: "nav-men",
+    label: "Men",
+    href: "/catalog/men",
     hasMenu: [
       {
-        name: "Clothing",
+        name: "Topwear",
         items: [
-          { id: "c-puffers", label: "Puffers", href: "/catalog/puffers", badge: "New" },
-          { id: "c-outerwear", label: "Outerwear", href: "/catalog/outerwear" },
-          { id: "c-hoodies", label: "Hoodies | Sweatshirts", href: "/catalog/hoodies-sweatshirts" },
-          { id: "c-knitwear", label: "Knitwear", href: "/catalog/knitwear" },
-          { id: "c-longsleeves", label: "Long Sleeves", href: "/catalog/long-sleeves", badge: "New" },
-          { id: "c-tshirts", label: "T-Shirts", href: "/catalog/t-shirts" },
-          { id: "c-shirts", label: "Shirts | Polos", href: "/catalog/shirts-polos" },
-          { id: "c-jeans", label: "Jeans", href: "/catalog/jeans" },
-          { id: "c-pants", label: "Pants", href: "/catalog/pants" },
-          { id: "c-loungewear", label: "Lounge Wear", href: "/catalog/lounge-wear", badge: "New" },
+          { id: "men-t-shirts", label: "T-Shirts", href: "/catalog/men-t-shirts" },
+          { id: "men-shirts", label: "Shirts", href: "/catalog/men-shirts" },
+          { id: "men-hoodies", label: "Hoodies & Sweatshirts", href: "/catalog/men-hoodies" },
         ],
       },
       {
-        name: "Accessories",
+        name: "Bottomwear",
         items: [
-          { id: "a-all", label: "View All Accessories", href: "/catalog/accessories" },
-          { id: "a-headwear", label: "Headwear", href: "/catalog/headwear" },
-          { id: "a-bags", label: "Bags | Leather Goods", href: "/catalog/bags-leather-goods" },
-          { id: "a-jewelry", label: "Jewelry", href: "/catalog/jewelry" },
-          { id: "a-underwear", label: "Underwear", href: "/catalog/underwear" },
-          { id: "a-scarves", label: "Scarves & Others", href: "/catalog/scarves-others", badge: "New" },
-          { id: "a-objects", label: "Objects", href: "/catalog/objects" },
-          { id: "a-giftcard", label: "Gift card", href: "/gift-cards" },
+          { id: "men-jeans", label: "Jeans", href: "/catalog/men-jeans" },
+          { id: "men-trousers", label: "Trousers & Cargos", href: "/catalog/men-trousers" },
         ],
       },
       {
-        name: "Women's Exclusive",
+        name: "Outerwear",
         items: [
-          { id: "w-new", label: "New Arrivals", href: "/catalog/womens-new-arrivals" },
-          { id: "w-tops", label: "Tops", href: "/catalog/womens-tops" },
-          { id: "w-bottoms", label: "Bottoms", href: "/catalog/womens-bottoms" },
-          { id: "w-skirts", label: "Skirts & Dresses", href: "/catalog/skirts-dresses" },
-          { id: "w-sweatshirts", label: "Knitwear | Sweatshirts", href: "/catalog/womens-sweatshirts" },
-          { id: "w-matching", label: "Matching Sets", href: "/catalog/matching-sets" },
-          { id: "w-bags", label: "Bags | Leather Goods", href: "/catalog/womens-bags" },
-          { id: "w-jewelry", label: "Jewelry", href: "/catalog/womens-jewelry" },
-          { id: "w-swimwear", label: "Swimwear", href: "/catalog/swimwear" },
+          { id: "men-jackets", label: "Jackets & Coats", href: "/catalog/men-jackets" },
         ],
       },
     ],
   },
   {
-    id: "nav-new-in",
-    label: "New In",
-    href: "/catalog?sort=newest",
+    id: "nav-women",
+    label: "Women",
+    href: "/catalog/women",
+    hasMenu: [
+      {
+        name: "Topwear",
+        items: [
+          { id: "women-tops", label: "Tops & Tees", href: "/catalog/women-tops" },
+          { id: "women-shirts", label: "Shirts & Blouses", href: "/catalog/women-shirts" },
+        ],
+      },
+      {
+        name: "Bottomwear",
+        items: [
+          { id: "women-skirts-pants", label: "Skirts & Pants", href: "/catalog/women-skirts-pants" },
+          { id: "women-denim", label: "Denim", href: "/catalog/women-denim" },
+        ],
+      },
+      {
+        name: "Dresses",
+        items: [
+          { id: "women-maxi-dresses", label: "Maxi & Midi Dresses", href: "/catalog/women-maxi-dresses" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "nav-kids",
+    label: "Kids",
+    href: "/catalog/kids",
+    hasMenu: [
+      {
+        name: "Boys",
+        items: [
+          { id: "kids-boys-tees", label: "Tees & Polos", href: "/catalog/kids-boys-tees" },
+          { id: "kids-boys-bottoms", label: "Shorts & Joggers", href: "/catalog/kids-boys-bottoms" },
+        ],
+      },
+      {
+        name: "Girls",
+        items: [
+          { id: "kids-girls-dresses", label: "Dresses & Jumpsuits", href: "/catalog/kids-girls-dresses" },
+          { id: "kids-girls-tops", label: "Tops & Leggings", href: "/catalog/kids-girls-tops" },
+        ],
+      },
+    ],
   },
 ];
