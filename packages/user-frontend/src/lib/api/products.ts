@@ -557,9 +557,7 @@ export async function getProductStorefront(
       vendorId: "Default Vendor",
       name: fallback.name,
       slug: fallback.slug,
-      description:
-        fallback.description ||
-        "Heavyweight 240 GSM pure combed cotton streetwear tee. Designed with a dropped-shoulder relaxed boxy fit, ribbed crewneck, and pre-shrunk washed finish.",
+      description: fallback.description || "",
       category: {
         id: "cat-topwear",
         name: "Topwear",

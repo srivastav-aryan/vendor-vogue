@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
-import { Plus, Check, ShieldCheck, Ruler, ArrowRight } from "lucide-react";
+import { Check, Ruler } from "lucide-react";
 import type { ProductWithVariantsResponse, VariantResponse } from "@e-com/shared/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -40,7 +39,6 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
   const [emiModalOpen, setEmiModalOpen] = React.useState(false);
   const [sizeUnit, setSizeUnit] = React.useState<"in" | "cm">("in");
   const [toastMessage, setToastMessage] = React.useState<string | null>(null);
-  const [crossSellAdded, setCrossSellAdded] = React.useState(false);
 
   // Auto-dismiss toast
   React.useEffect(() => {
@@ -59,16 +57,20 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
 
   const selectedSize = getVariantSize(selectedVariant);
 
-  // Compute specs line: "unisex | S-XL | 240 gsm | 7.1 oz"
+  // Derive specs metadata directly from backend variant data
   const sizeList = variants.map(getVariantSize);
   const sizeRangeStr =
     sizeList.length > 1
       ? `${sizeList[0]}-${sizeList[sizeList.length - 1]}`
-      : sizeList[0] || "S-XL";
+      : sizeList[0] || "";
 
-  const weightGsm = selectedVariant.weightInGrams || 240;
-  const weightOz = (weightGsm / 33.906).toFixed(1);
-  const specsLine = `unisex | ${sizeRangeStr} | ${weightGsm} gsm | ${weightOz} oz`;
+  const specsParts: string[] = ["unisex"];
+  if (sizeRangeStr) specsParts.push(sizeRangeStr);
+  if (selectedVariant.weightInGrams) {
+    specsParts.push(`${selectedVariant.weightInGrams} gsm`);
+    specsParts.push(`${(selectedVariant.weightInGrams / 33.906).toFixed(1)} oz`);
+  }
+  const specsLine = specsParts.join(" | ");
 
   // Pricing formatting in INR
   const sellingPrice = selectedVariant.sellingPrice || 1999;
@@ -106,11 +108,6 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
     setToastMessage(`Proceeding to checkout with Size ${selectedSize.toUpperCase()}...`);
   };
 
-  const handleAddCrossSell = () => {
-    setCrossSellAdded(true);
-    setToastMessage(`Added "Heather Grey Sweatpants" to your bag!`);
-  };
-
   return (
     <div className="w-full space-y-5 text-left font-sans select-none">
       {/* Toast Notification Pill */}
@@ -125,7 +122,7 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
         </div>
       )}
 
-      {/* 1. PRODUCT TITLE (Large, bold, clean uppercase sans-serif) */}
+      {/* 1. PRODUCT TITLE (Directly from backend product.name) */}
       <div>
         <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-black uppercase tracking-tight text-neutral-900 leading-[1.08]">
           {product.name}
@@ -149,7 +146,7 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
         )}
       </div>
 
-      {/* 4. BADGES & FINTECH EMI BOX (Matching Reference Image) */}
+      {/* 4. BADGES & FINTECH EMI BOX */}
       <div className="rounded-xl border border-neutral-200/80 bg-neutral-100/60 p-3.5 space-y-2">
         <div className="flex items-center gap-2 text-xs">
           {isNewArrival && (
@@ -190,16 +187,9 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
         <span className="text-[#e5a800] text-sm tracking-[-1px] select-none">
           ★★★★★
         </span>
-        <button
-          type="button"
-          onClick={() => {
-            const reviewsEl = document.getElementById("reviews-section");
-            if (reviewsEl) reviewsEl.scrollIntoView({ behavior: "smooth" });
-          }}
-          className="text-xs font-semibold text-neutral-700 hover:text-black underline cursor-pointer"
-        >
+        <span className="text-xs font-semibold text-neutral-700">
           9 reviews
-        </button>
+        </span>
       </div>
 
       {/* 6. SIZE SELECTOR WITH STOCK CHECKS */}
@@ -286,109 +276,27 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
         </Button>
       </div>
 
-      {/* 8. ACCESSORIES & CROSS-SELL ("pair it with" card) */}
-      <div className="pt-2">
-        <div className="rounded-lg border border-neutral-200 bg-neutral-50/70 p-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {/* Cross-sell Thumbnail */}
-            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xs bg-neutral-200 border border-neutral-200">
-              <Image
-                src="https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=200&auto=format&fit=crop&q=80"
-                alt="Heather grey sweatpants"
-                fill
-                sizes="48px"
-                className="object-cover object-center"
-              />
-            </div>
-
-            <div className="text-left">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
-                pair it with
-              </p>
-              <p className="text-xs font-semibold text-neutral-900 leading-tight">
-                heather grey sweatpants
-              </p>
-              <p className="text-xs font-medium text-neutral-600">
-                ₹ 2,298.00
-              </p>
-            </div>
-          </div>
-
-          {/* Quick [+] Add Button */}
-          <button
-            type="button"
-            onClick={handleAddCrossSell}
-            aria-label="Add heather grey sweatpants to bag"
-            className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-xs border transition-all duration-200",
-              crossSellAdded
-                ? "bg-emerald-600 border-emerald-600 text-white"
-                : "border-neutral-300 bg-white text-neutral-900 hover:bg-black hover:border-black hover:text-white"
-            )}
-          >
-            {crossSellAdded ? (
-              <Check className="h-4 w-4 stroke-[2.5]" />
-            ) : (
-              <Plus className="h-4 w-4 stroke-[2.2]" />
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* 9. PROMO BANNER: Coral/rose alert box matching reference image */}
-      <div className="w-full rounded-xs bg-[#e68a8a] px-4 py-2.5 text-center text-xs font-medium text-neutral-950">
-        use code <strong className="font-bold underline">welcom3</strong> for 5% off your first order.
-      </div>
-
-      {/* 10. SHIPPING & POLICY FOOTNOTE */}
-      <div className="pt-1 text-left text-[11px] text-neutral-500 leading-tight">
+      {/* 8. SHIPPING & POLICY FOOTNOTE */}
+      <div className="pt-2 text-left text-[11px] text-neutral-500 leading-tight">
         <p className="font-semibold text-neutral-700 uppercase tracking-wider">easy returns</p>
         <p>within 7 days of delivery*</p>
       </div>
 
-      {/* 11. STREETWEAR DETAILS ACCORDION (shadcn Accordion primitive) */}
-      <div className="pt-3 border-t border-neutral-200">
-        <Accordion type="single" collapsible defaultValue="details" className="w-full">
-          <AccordionItem value="details" className="border-b border-neutral-200">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-wider text-neutral-900 py-3.5 hover:no-underline">
-              Description & Silhouette
-            </AccordionTrigger>
-            <AccordionContent className="text-xs text-neutral-600 leading-relaxed space-y-2">
-              <p>{product.description}</p>
-              <ul className="list-disc pl-4 space-y-1 pt-1 text-[11px]">
-                <li>Dropped shoulder cut with layered contrast sleeves</li>
-                <li>High-density silk-screened vintage artwork</li>
-                <li>Pre-shrunk, enzyme washed for authentic vintage handfeel</li>
-                <li>Ribbed crew collar and reinforced double-needle hems</li>
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="fabric" className="border-b border-neutral-200">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-wider text-neutral-900 py-3.5 hover:no-underline">
-              Fabric, Weight & Care
-            </AccordionTrigger>
-            <AccordionContent className="text-xs text-neutral-600 leading-relaxed space-y-1.5 text-[11px]">
-              <p>• 100% combed heavyweight cotton (240 GSM / 7.1 oz/yd²)</p>
-              <p>• Machine wash cold inside out with like colors</p>
-              <p>• Hang dry in shade or tumble dry on low heat</p>
-              <p>• Do not iron directly over screenprinted graphic</p>
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="delivery" className="border-none">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-wider text-neutral-900 py-3.5 hover:no-underline">
-              Free Shipping & Returns
-            </AccordionTrigger>
-            <AccordionContent className="text-xs text-neutral-600 leading-relaxed space-y-1.5 text-[11px]">
-              <p>• All orders dispatch within 24-48 hours from our fulfillment center.</p>
-              <p>• Standard courier delivery takes 3-5 business days across India.</p>
-              <p>• Cash on Delivery (COD) available at checkout.</p>
-              <p>• Hassle-free reverse pickups for size exchanges and returns within 7 days.</p>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </div>
+      {/* 9. PRODUCT DESCRIPTION (Directly and ONLY from backend product.description) */}
+      {product.description && (
+        <div className="pt-3 border-t border-neutral-200">
+          <Accordion type="single" collapsible defaultValue="description" className="w-full">
+            <AccordionItem value="description" className="border-none">
+              <AccordionTrigger className="text-xs font-bold uppercase tracking-wider text-neutral-900 py-3.5 hover:no-underline">
+                Description
+              </AccordionTrigger>
+              <AccordionContent className="text-xs text-neutral-600 leading-relaxed">
+                <p>{product.description}</p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      )}
 
       {/* SIZE CHART DIALOG (shadcn Dialog primitive) */}
       <Dialog open={sizeChartOpen} onOpenChange={setSizeChartOpen}>
