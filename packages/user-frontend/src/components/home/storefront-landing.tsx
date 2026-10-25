@@ -7,6 +7,7 @@ import { BestsellerSection } from "@/components/home/bestseller-section";
 import { InfiniteMarquee } from "@/components/common/infinite-marquee";
 import { TrendingSection } from "@/components/home/trending-section";
 import { CampaignBannerVideo } from "@/components/home/campaign-banner-video";
+import { DiscoverCampaignSection } from "@/components/home/discover-campaign-section";
 import type { NavigationItem } from "@e-com/shared/types";
 import { DEFAULT_NAV_ITEMS } from "@/lib/constants/navigation";
 import type { BestsellerProduct } from "@/lib/api/products";
@@ -45,6 +46,9 @@ export function StorefrontLanding({
 
         {/* Cinematic Campaign Banner Video Strip directly below Trending Section */}
         <CampaignBannerVideo />
+
+        {/* Editorial Discover Campaign Section using discover.jpg */}
+        <DiscoverCampaignSection />
       </main>
     </div>
   );
