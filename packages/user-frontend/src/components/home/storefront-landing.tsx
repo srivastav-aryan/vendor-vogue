@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Header } from "@/components/layout/header";
 import { Hero } from "@/components/home/hero";
+import { InfiniteMarquee } from "@/components/common/infinite-marquee";
 import { BestsellerSection } from "@/components/home/bestseller-section";
 import type { NavigationItem } from "@e-com/shared/types";
 import { DEFAULT_NAV_ITEMS } from "@/lib/constants/navigation";
@@ -29,7 +30,10 @@ export function StorefrontLanding({
         {/* Full Viewport Campaign Hero */}
         <Hero onScrollThresholdChange={setIsScrolled} />
 
-        {/* Bestseller Product Section directly below Hero */}
+        {/* Infinite Brand Marquee (react-fast-marquee) */}
+        <InfiniteMarquee text="Vendor Vogue™" />
+
+        {/* Bestseller Product Section directly below */}
         <BestsellerSection initialProducts={initialBestsellers} />
       </main>
     </div>
