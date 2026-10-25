@@ -53,7 +53,14 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   return (
     <div className="w-full">
       {/* 1. DESKTOP GALLERY: 2-Column Grid matching reference image */}
-      <div className="hidden md:grid md:grid-cols-2 gap-3 lg:gap-4">
+      <div
+        className={cn(
+          "hidden md:grid gap-3 lg:gap-4",
+          displayImages.length === 1
+            ? "md:grid-cols-1 max-w-xl mx-auto"
+            : "md:grid-cols-2"
+        )}
+      >
         {displayImages.map((src, index) => (
           <div
             key={`desktop-img-${index}`}

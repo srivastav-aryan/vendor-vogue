@@ -66,8 +66,6 @@ export const REFERENCE_STREETWEAR_PDP: ProductWithVariantsResponse = {
   images: [
     "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=1200&auto=format&fit=crop&q=90",
     "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=1200&auto=format&fit=crop&q=90",
-    "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=1200&auto=format&fit=crop&q=90",
-    "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1200&auto=format&fit=crop&q=90",
   ],
   tags: ["new-arrival", "bestseller", "trending"],
   isActive: true,
@@ -531,14 +529,6 @@ export async function getProductStorefront(
           );
         }
 
-        // If product has only 1 image, provide complementary angles
-        if (prod.images.length === 1) {
-          prod.images.push(
-            "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=1200&auto=format&fit=crop&q=90",
-            "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=1200&auto=format&fit=crop&q=90"
-          );
-        }
-
         return prod;
       }
     }
@@ -571,11 +561,7 @@ export async function getProductStorefront(
       },
       hsnCode: "610910",
       gstRate: 12,
-      images: [
-        ...fallback.images,
-        "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=1200&auto=format&fit=crop&q=90",
-        "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1200&auto=format&fit=crop&q=90",
-      ],
+      images: fallback.images,
       tags: fallback.tags,
       isActive: true,
       createdAt: new Date().toISOString(),
