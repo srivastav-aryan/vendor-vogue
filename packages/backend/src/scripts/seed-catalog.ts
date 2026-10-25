@@ -60,6 +60,17 @@ async function seedCatalog() {
     await connectDB();
     console.log("Connected successfully.\n");
 
+    try {
+      const existingIndexes = await Category.collection.indexes();
+      const legacyNameIndex = existingIndexes.find((idx) => idx.name === "name_1");
+      if (legacyNameIndex) {
+        console.log("Dropping legacy global 'name_1' index in favor of '{ parent: 1, name: 1 }'...");
+        await Category.collection.dropIndex("name_1");
+      }
+    } catch {
+      // Ignore
+    }
+
     // -------------------------------------------------------------------------
     // 1. Seed Brands
     // -------------------------------------------------------------------------
@@ -117,37 +128,77 @@ async function seedCatalog() {
       return cat;
     }
 
-    // Roots
+    // -------------------------------------------------------------------------
+    // Roots (Level 0)
+    // -------------------------------------------------------------------------
     const menRoot = await getOrCreateCategory("Men", "men", "Apparel, footwear and accessories for men");
     const womenRoot = await getOrCreateCategory("Women", "women", "Apparel, ethnic wear and accessories for women");
+    const kidsRoot = await getOrCreateCategory("Kids", "kids", "Apparel, casual wear and playwear for boys and girls");
 
-    // Men Subcategories (Level 1)
+    // -------------------------------------------------------------------------
+    // Men Subcategories (Level 1) & Leaf Categories (Level 2)
+    // -------------------------------------------------------------------------
     const menTopwear = await getOrCreateCategory("Topwear", "men-topwear", "Shirts, t-shirts, polos, and jackets for men", menRoot);
     const menBottomwear = await getOrCreateCategory("Bottomwear", "men-bottomwear", "Jeans, trousers, chinos, and shorts for men", menRoot);
-    const menEthnic = await getOrCreateCategory("Indian & Festive", "men-ethnic", "Traditional kurtas, sherwanis, and nehru jackets for men", menRoot);
+    const menOuterwear = await getOrCreateCategory("Outerwear", "men-outerwear", "Jackets, coats, and blazers for men", menRoot);
 
-    // Men Leaf Categories (Level 2)
-    const formalShirts = await getOrCreateCategory("Formal Shirts", "men-formal-shirts", "Classic business and boardroom formal shirts", menTopwear);
-    const casualShirts = await getOrCreateCategory("Casual Shirts", "men-casual-shirts", "Linen, oxford cotton, and weekend shirts", menTopwear);
-    const poloTees = await getOrCreateCategory("Polo T-Shirts", "men-polo-t-shirts", "Collared polo t-shirts and pique knits", menTopwear);
-    const denimJeans = await getOrCreateCategory("Denim Jeans", "men-denim-jeans", "Slim, straight, and tapered denim jeans", menBottomwear);
-    const kurtaSetsMen = await getOrCreateCategory("Kurta Sets", "men-kurta-sets", "Traditional festive silk and cotton kurta sets", menEthnic);
+    const menTShirts = await getOrCreateCategory("T-Shirts", "men-t-shirts", "Heavyweight, oversized, and graphic t-shirts for men", menTopwear);
+    const menShirts = await getOrCreateCategory("Shirts", "men-shirts", "Linen, oxford cotton, and weekend shirts for men", menTopwear);
+    const menHoodies = await getOrCreateCategory("Hoodies & Sweatshirts", "men-hoodies", "French terry hoodies and sweatshirts for men", menTopwear);
+    const menJeans = await getOrCreateCategory("Jeans", "men-jeans", "Slim, straight, and vintage washed denim jeans for men", menBottomwear);
+    const menTrousers = await getOrCreateCategory("Trousers & Cargos", "men-trousers", "Pleated trousers, chinos, and utilitarian cargos for men", menBottomwear);
+    const menJackets = await getOrCreateCategory("Jackets & Coats", "men-jackets", "Biker jackets, bomber jackets, and trench coats for men", menOuterwear);
 
-    // Women Subcategories (Level 1)
-    const womenEthnic = await getOrCreateCategory("Ethnic Wear", "women-ethnic", "Traditional Indian ethnic and festive collections", womenRoot);
-    const womenWestern = await getOrCreateCategory("Western Wear", "women-western", "Dresses, tops, blazers, and contemporary wear", womenRoot);
+    // -------------------------------------------------------------------------
+    // Women Subcategories (Level 1) & Leaf Categories (Level 2)
+    // -------------------------------------------------------------------------
+    const womenTopwear = await getOrCreateCategory("Topwear", "women-topwear", "Tops, baby tees, shirts, and luxury knits for women", womenRoot);
+    const womenBottomwear = await getOrCreateCategory("Bottomwear", "women-bottomwear", "Skirts, tailored trousers, and contemporary denim for women", womenRoot);
+    const womenDresses = await getOrCreateCategory("Dresses", "women-dresses", "Evening slip dresses, blazer dresses, and formal silhouettes for women", womenRoot);
 
-    // Women Leaf Categories (Level 2)
-    const kurtasWomen = await getOrCreateCategory("Kurtas & Kurtis", "women-kurtas-kurtis", "Everyday and occasion cotton and silk kurtis", womenEthnic);
-    const dressesWomen = await getOrCreateCategory("Dresses & Jumpsuits", "women-dresses-jumpsuits", "Midi, maxi, and floral wrap dresses", womenWestern);
+    const womenTops = await getOrCreateCategory("Tops & Tees", "women-tops", "Ribbed baby tees and sculpted crop tops for women", womenTopwear);
+    const womenShirts = await getOrCreateCategory("Shirts & Blouses", "women-shirts", "Oversized silk blend shirts and tailored blouses for women", womenTopwear);
+    const womenSkirtsPants = await getOrCreateCategory("Skirts & Pants", "women-skirts-pants", "High-waist wide pants and midi skirts for women", womenBottomwear);
+    const womenDenim = await getOrCreateCategory("Denim", "women-denim", "Low-rise baggy cargo jeans and wide-leg denim for women", womenBottomwear);
+    const womenMaxiDresses = await getOrCreateCategory("Maxi & Midi Dresses", "women-maxi-dresses", "Bias-cut satin slip maxi dresses and linen dresses for women", womenDresses);
 
-    categoryMap["formal-shirts"] = formalShirts;
-    categoryMap["casual-shirts"] = casualShirts;
-    categoryMap["polo-tees"] = poloTees;
-    categoryMap["denim-jeans"] = denimJeans;
-    categoryMap["kurta-sets-men"] = kurtaSetsMen;
-    categoryMap["kurtas-women"] = kurtasWomen;
-    categoryMap["dresses-women"] = dressesWomen;
+    // -------------------------------------------------------------------------
+    // Kids Subcategories (Level 1) & Leaf Categories (Level 2)
+    // -------------------------------------------------------------------------
+    const kidsBoys = await getOrCreateCategory("Boys", "kids-boys", "Apparel and casual wear for boys", kidsRoot);
+    const kidsGirls = await getOrCreateCategory("Girls", "kids-girls", "Dresses, tops, and playwear for girls", kidsRoot);
+
+    const kidsBoysTees = await getOrCreateCategory("Tees & Polos", "kids-boys-tees", "Organic cotton colorblock t-shirts and polos for boys", kidsBoys);
+    const kidsBoysBottoms = await getOrCreateCategory("Shorts & Joggers", "kids-boys-bottoms", "Fleece jogger pants and casual shorts for boys", kidsBoys);
+    const kidsGirlsDresses = await getOrCreateCategory("Dresses & Jumpsuits", "kids-girls-dresses", "Tiered cotton floral dresses and everyday jumpsuits for girls", kidsGirls);
+    const kidsGirlsTops = await getOrCreateCategory("Tops & Leggings", "kids-girls-tops", "Ribbed flutter-sleeve tops and stretch cotton leggings for girls", kidsGirls);
+
+    categoryMap["men-t-shirts"] = menTShirts;
+    categoryMap["men-shirts"] = menShirts;
+    categoryMap["men-hoodies"] = menHoodies;
+    categoryMap["men-jeans"] = menJeans;
+    categoryMap["men-trousers"] = menTrousers;
+    categoryMap["men-jackets"] = menJackets;
+
+    categoryMap["women-tops"] = womenTops;
+    categoryMap["women-shirts"] = womenShirts;
+    categoryMap["women-skirts-pants"] = womenSkirtsPants;
+    categoryMap["women-denim"] = womenDenim;
+    categoryMap["women-maxi-dresses"] = womenMaxiDresses;
+
+    categoryMap["kids-boys-tees"] = kidsBoysTees;
+    categoryMap["kids-boys-bottoms"] = kidsBoysBottoms;
+    categoryMap["kids-girls-dresses"] = kidsGirlsDresses;
+    categoryMap["kids-girls-tops"] = kidsGirlsTops;
+
+    // Legacy aliases for existing product references
+    categoryMap["casual-shirts"] = menShirts;
+    categoryMap["formal-shirts"] = menShirts;
+    categoryMap["polo-tees"] = menTShirts;
+    categoryMap["denim-jeans"] = menJeans;
+    categoryMap["kurta-sets-men"] = menShirts;
+    categoryMap["kurtas-women"] = womenTops;
+    categoryMap["dresses-women"] = womenMaxiDresses;
 
     // -------------------------------------------------------------------------
     // 3. Seed Apparel Products & SKU Variants

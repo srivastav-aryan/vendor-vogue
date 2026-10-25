@@ -15,6 +15,7 @@
     "dev:ts": "tsc --watch",
     "clean": "rimraf dist",
     "build": "tsc",
+    "seed:categories": "pnpm run build && node dist/src/scripts/seed-categories.js",
     "seed:admin": "pnpm run build && node dist/src/scripts/seed-admin.js",
     "seed:catalog": "pnpm run build && node dist/src/scripts/seed-catalog.js"
   },
