@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { Footer } from "@/components/layout/footer";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -37,8 +38,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen bg-background font-sans antialiased text-foreground">
-        {children}
+      <body className="min-h-screen bg-background font-sans antialiased text-foreground flex flex-col justify-between">
+        <div className="flex-1">{children}</div>
+        <Footer />
       </body>
     </html>
   );
