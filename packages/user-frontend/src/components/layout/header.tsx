@@ -9,6 +9,9 @@ import type { NavigationItem } from "@e-com/shared/types";
 import { DEFAULT_NAV_ITEMS } from "@/lib/constants/navigation";
 import { MegaMenu } from "./mega-menu";
 import { MobileNavSheet } from "./mobile-nav-sheet";
+import { CartDrawer } from "@/components/cart/cart-drawer";
+import { useCartStore } from "@/lib/store/cart-store";
+import { useHydratedStore } from "@/lib/store/use-store";
 
 interface HeaderProps {
   isScrolled?: boolean;
@@ -24,6 +27,11 @@ export function Header({
   const [mobileSheetOpen, setMobileSheetOpen] = React.useState(false);
   const [searchOverlayOpen, setSearchOverlayOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
+
+  const setCartDrawerOpen = useCartStore((s) => s.setDrawerOpen);
+  const totalCartCount = useHydratedStore(useCartStore, (s) =>
+    s.items.reduce((acc, i) => acc + i.quantity, 0)
+  ) ?? 0;
 
   const searchInputRef = React.useRef<HTMLInputElement | null>(null);
   const openTimerRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -189,29 +197,23 @@ export function Header({
               SEARCH
             </button>
 
-            {/* ♡ Wishlist - Desktop & Tablet only */}
-            <Link
-              href="/wishlist"
+            {/* BAG Button: Opens Cart Drawer directly */}
+            <button
+              type="button"
+              onClick={() => setCartDrawerOpen(true)}
               className={cn(
-                "hidden md:inline-block text-base leading-none transition-colors",
-                isWhiteMode ? "text-neutral-700 hover:text-black" : "text-white/90 hover:text-white drop-shadow-sm"
+                "inline-flex items-center gap-1.5 tracking-[0.2em] transition-colors cursor-pointer py-1 font-semibold",
+                isWhiteMode ? "text-neutral-900 hover:text-black" : "text-white/90 hover:text-white drop-shadow-sm"
               )}
-              aria-label="Wishlist"
+              aria-label={`Shopping bag (${totalCartCount} items)`}
             >
-              ♡
-            </Link>
-
-            {/* BAG - Always visible, clean and non-clustered */}
-            <Link
-              href="/cart"
-              className={cn(
-                "tracking-[0.2em] transition-colors cursor-pointer py-1",
-                isWhiteMode ? "text-neutral-900 hover:text-black font-semibold" : "text-white/90 hover:text-white drop-shadow-sm"
+              <span>BAG</span>
+              {totalCartCount > 0 && (
+                <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 bg-black text-white rounded-xs">
+                  {totalCartCount}
+                </span>
               )}
-              aria-label="Shopping bag"
-            >
-              BAG
-            </Link>
+            </button>
 
             {/* Mobile Menu Trigger (Hamburger) */}
             <button
@@ -317,6 +319,9 @@ export function Header({
         onOpenChange={setMobileSheetOpen}
         navItems={navItems}
       />
+
+      {/* Slide-out Shopping Bag Drawer */}
+      <CartDrawer />
     </>
   );
 }

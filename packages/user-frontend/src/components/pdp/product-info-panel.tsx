@@ -19,6 +19,7 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
+import { useCartStore } from "@/lib/store/cart-store";
 
 interface ProductInfoPanelProps {
   product: ProductWithVariantsResponse;
@@ -39,6 +40,8 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
   const [emiModalOpen, setEmiModalOpen] = React.useState(false);
   const [sizeUnit, setSizeUnit] = React.useState<"in" | "cm">("in");
   const [toastMessage, setToastMessage] = React.useState<string | null>(null);
+
+  const addItem = useCartStore((s) => s.addItem);
 
   // Auto-dismiss toast
   React.useEffect(() => {
@@ -101,11 +104,22 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
   const isBestseller = tagsLower.includes("bestseller");
 
   const handleAddToCart = () => {
-    setToastMessage(`Added "${product.name}" (Size ${selectedSize.toUpperCase()}) to cart`);
+    addItem({
+      productId: product.id,
+      variantId: selectedVariant.id,
+      name: product.name,
+      slug: product.slug,
+      size: selectedSize.toUpperCase(),
+      price: sellingPrice,
+      mrp: mrp || undefined,
+      image: selectedVariant.images?.[0] || product.images?.[0] || "",
+      maxStock: selectedVariant.availableStock ?? selectedVariant.stockQuantity ?? 10,
+    });
+    setToastMessage(`Added "${product.name}" (${selectedSize.toUpperCase()}) to cart`);
   };
 
   const handleBuyNow = () => {
-    setToastMessage(`Proceeding to checkout with Size ${selectedSize.toUpperCase()}...`);
+    handleAddToCart();
   };
 
   return (

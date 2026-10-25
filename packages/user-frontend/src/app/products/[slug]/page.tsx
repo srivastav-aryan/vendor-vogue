@@ -128,7 +128,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
             {/* Right Column (Desktop 40% / col-span-5): Sticky purchase info panel */}
             <div className="lg:col-span-5 w-full lg:sticky lg:top-28 lg:self-start">
-              <ProductInfoPanel product={product} />
+              <ProductInfoPanel key={product.id} product={product} />
             </div>
           </div>
         </div>
