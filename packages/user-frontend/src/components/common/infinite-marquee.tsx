@@ -23,7 +23,7 @@ export function InfiniteMarquee({
       role="region"
       aria-label="Brand Announcement"
       className={cn(
-        "w-full overflow-hidden bg-black py-2.5 sm:py-3 text-white border-y border-neutral-900 select-none",
+        "w-full overflow-hidden bg-black py-3 sm:py-3.5 md:py-4 text-white border-y border-neutral-900 select-none",
         className
       )}
     >
@@ -33,7 +33,7 @@ export function InfiniteMarquee({
           {items.map((_, i) => (
             <span
               key={`track1-${i}`}
-              className="text-xs sm:text-[13px] md:text-sm font-bold tracking-tight text-white whitespace-nowrap mx-6 sm:mx-9 md:mx-12"
+              className="text-sm sm:text-base md:text-lg font-bold tracking-tight text-white whitespace-nowrap mx-6 sm:mx-10 md:mx-14"
             >
               {text}
             </span>
@@ -45,7 +45,7 @@ export function InfiniteMarquee({
           {items.map((_, i) => (
             <span
               key={`track2-${i}`}
-              className="text-xs sm:text-[13px] md:text-sm font-bold tracking-tight text-white whitespace-nowrap mx-6 sm:mx-9 md:mx-12"
+              className="text-sm sm:text-base md:text-lg font-bold tracking-tight text-white whitespace-nowrap mx-6 sm:mx-10 md:mx-14"
             >
               {text}
             </span>
