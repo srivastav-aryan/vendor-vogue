@@ -34,10 +34,14 @@ export { authCache, type AuthCacheEntry } from "./cache/auth.cache.js";
 // Controllers
 export { authControllerCreator } from "./controllers/auth.controller.js";
 export type { RateLimiter } from "./controllers/auth.controller.js";
-
+export {
+  userControllerCreator,
+  type UserControllerInterface,
+} from "./controllers/user.controller.js";
 
 // Middlewares
 export { createAuthMiddleware } from "./middlewares/authentication.middleware.js";
 
 // Routes
 export { createAuthRouter } from "./routes/auth.routes.js";
+export { createUserRouter } from "./routes/user.routes.js";

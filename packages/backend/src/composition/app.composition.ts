@@ -13,6 +13,9 @@ import {
   TokenServiceInterface,
   IAuthService,
   createAuthRouter,
+  userControllerCreator,
+  UserControllerInterface,
+  createUserRouter,
 } from "../modules/identity/index.js";
 import {
   BrandService,
@@ -50,10 +53,12 @@ const loginLimiter = new RateLimiterService(
 );
 // --- Controllers ---
 export const authController: AuthControllerInterface = authControllerCreator(authServices, loginLimiter, tokenService);
+export const userController: UserControllerInterface = userControllerCreator();
 // --- Middleware ---
 export const authenticateMiddleware = createAuthMiddleware(tokenService, userServices);
- // -- Router ---
- export const authRouter = createAuthRouter(authController) 
+// -- Router ---
+export const authRouter = createAuthRouter(authController);
+export const userRouter = createUserRouter(userController, authenticateMiddleware); 
 
 
 // *********** Catalog Module**********

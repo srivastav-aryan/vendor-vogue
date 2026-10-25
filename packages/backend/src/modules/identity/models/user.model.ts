@@ -38,6 +38,28 @@ export interface IUser extends Document {
   generateEmailVerificationToken(): Promise<string>;
 }
 
+const userAddressSubSchema = new Schema(
+  {
+    addressType: {
+      type: String,
+      enum: ["HOME", "OFFICE", "OTHER"],
+      default: "HOME",
+    },
+    name: { type: String, required: true, trim: true },
+    phone: { type: String, required: true, trim: true },
+    addressLine1: { type: String, required: true, trim: true },
+    addressLine2: { type: String, trim: true, default: "" },
+    landmark: { type: String, trim: true, default: "" },
+    locality: { type: String, required: true, trim: true },
+    city: { type: String, required: true, trim: true },
+    state: { type: String, required: true, trim: true },
+    pincode: { type: String, required: true, trim: true },
+    country: { type: String, required: true, trim: true, default: "India" },
+    isDefault: { type: Boolean, default: false },
+  },
+  { _id: true, timestamps: true },
+);
+
 const userSchema = new Schema<IUser>(
   {
     email: {
@@ -88,7 +110,7 @@ const userSchema = new Schema<IUser>(
       sparse: true,
     },
     addresses: {
-      type: [String],
+      type: [userAddressSubSchema],
       default: [],
     },
 

@@ -1,17 +1,51 @@
 import z from "zod";
 
 export const userAddressSchema = z.object({
-  addressType: z.enum(["HOME", "OFFICE", "OTHER"]),
-  pincode: z.string().min(6, "Pincode must be 6 digits"),
+  id: z.string().optional(),
+  _id: z.string().optional(),
+  addressType: z.enum(["HOME", "OFFICE", "OTHER"]).default("HOME"),
+  pincode: z.string().min(6, "Pincode must be at least 6 digits"),
   state: z.string().min(1, "State is required"),
   locality: z.string().min(1, "Locality is required"),
   city: z.string().min(1, "City is required"),
-  country: z.string().min(1, "Country is required"),
+  country: z.string().min(1, "Country is required").default("India"),
   addressLine1: z.string().min(1, "Address line 1 is required"),
-  addressLine2: z.string().min(1, "Address line 2 is required"),
-  landmark: z.string().min(1, "Landmark is required"),
-  phone: z.string().min(1, "Phone is required"),
+  addressLine2: z.string().optional().default(""),
+  landmark: z.string().optional().default(""),
+  phone: z.string().min(10, "Phone must be at least 10 digits"),
   name: z.string().min(1, "Name is required"),
+  isDefault: z.boolean().optional().default(false),
 });
 
 export type UserAddress = z.infer<typeof userAddressSchema>;
+
+export const updateAddressesSchema = z.object({
+  body: z.object({
+    addresses: z.array(userAddressSchema),
+  }),
+});
+
+export const addAddressSchema = z.object({
+  body: userAddressSchema,
+});
+
+export const addressIdParamSchema = z.object({
+  params: z.object({
+    addressId: z.string().min(1, "Address ID is required"),
+  }),
+});
+
+export const updateProfileSchema = z.object({
+  body: z.object({
+    firstname: z.string().min(1, "Firstname must not be empty").optional(),
+    lastname: z.string().min(1, "Lastname must not be empty").optional(),
+    phone: z
+      .string()
+      .regex(/^[0-9]{10,15}$/, "Invalid phone number format (10-15 digits expected)")
+      .optional(),
+  }),
+});
+
+export type UpdateAddressesInput = z.infer<typeof updateAddressesSchema>["body"];
+export type AddAddressInput = z.infer<typeof addAddressSchema>["body"];
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>["body"];

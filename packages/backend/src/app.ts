@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import {
   authRouter,
+  userRouter,
   brandRouter,
   cartRouter,
   categoryRouter,
@@ -125,8 +126,9 @@ export const createApp = (): express.Application => {
     });
   });
 
-  // Auth endpoint for REST API
+  // Auth & User endpoints for REST API
   app.use("/api/auth", authRouter);
+  app.use("/api/users", userRouter);
 
   // Catalog endpoints
   app.use("/api/catalog/brands", brandRouter);
