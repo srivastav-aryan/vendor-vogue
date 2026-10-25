@@ -19,8 +19,7 @@ export function CampaignBannerVideo({
     const video = videoRef.current;
     if (!video) return;
 
-    // Use IntersectionObserver to optimize GPU/CPU and battery drain:
-    // Only play video when visible in viewport, pause when scrolled out of view.
+    // IntersectionObserver to pause video when offscreen and play when visible
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -28,7 +27,7 @@ export function CampaignBannerVideo({
             const playPromise = video.play();
             if (playPromise !== undefined) {
               playPromise.catch(() => {
-                // Autoplay may be blocked by user policy or aborted; fail silently
+                // Autoplay policy or abort; fail silently
               });
             }
           } else {
@@ -37,7 +36,7 @@ export function CampaignBannerVideo({
         });
       },
       {
-        threshold: 0.15, // Trigger when at least 15% of banner is visible
+        threshold: 0.15,
       }
     );
 
@@ -51,11 +50,15 @@ export function CampaignBannerVideo({
   return (
     <section
       aria-label="Campaign Banner Video"
-      className={`relative w-full overflow-hidden select-none bg-black h-[220px] sm:h-[240px] md:h-[280px] lg:h-[340px] xl:h-[380px] ${
+      className={`relative w-full overflow-hidden select-none bg-black flex items-center justify-center h-[520px] sm:h-[620px] md:h-[740px] lg:h-[840px] py-3 sm:py-6 ${
         className || ""
       }`}
     >
-      {/* Cinematic Video Strip */}
+      {/* 
+        High-Performance Cinematic Video:
+        - object-contain ensures the full video frame is 100% visible with zero zooming or cropping.
+        - Sized within the expanded responsive height container.
+      */}
       <video
         ref={videoRef}
         src={videoSrc}
@@ -65,12 +68,12 @@ export function CampaignBannerVideo({
         loop
         playsInline
         preload="metadata"
-        className="w-full h-full object-cover object-center"
+        className="w-full h-full max-h-full object-contain object-center"
       />
 
-      {/* Subtle Dark Vignette Overlay for High-Contrast Clean Visuals */}
+      {/* Subtle overlay */}
       <div
-        className="absolute inset-0 bg-black/20 pointer-events-none"
+        className="absolute inset-0 bg-black/10 pointer-events-none"
         aria-hidden="true"
       />
     </section>
