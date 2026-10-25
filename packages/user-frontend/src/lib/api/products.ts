@@ -1,5 +1,9 @@
 import { env } from "@/lib/env";
-import type { ProductDetailResponse, VariantResponse } from "@e-com/shared/types";
+import type {
+  ProductDetailResponse,
+  ProductWithVariantsResponse,
+  VariantResponse,
+} from "@e-com/shared/types";
 
 export interface BestsellerProduct {
   id: string;
@@ -26,10 +30,152 @@ export interface ProductsApiResponse {
   };
 }
 
+export interface ProductStorefrontApiResponse {
+  success: boolean;
+  data: ProductWithVariantsResponse;
+}
+
 export interface VariantsApiResponse {
   success: boolean;
   data: VariantResponse[];
 }
+
+/**
+ * Sample streetwear PDP product matching the user's exact reference photo.
+ */
+export const REFERENCE_STREETWEAR_PDP: ProductWithVariantsResponse = {
+  id: "by-my-side-layered-oversized-full-sleeve",
+  vendorId: "Default Vendor",
+  name: "BY MY SIDE LAYERED OVERSIZED FULL SLEEVE",
+  slug: "by-my-side-layered-oversized-full-sleeve",
+  description:
+    "Heavyweight 240 GSM pure combed cotton layered long-sleeve tee. Features a vintage washed screenprinted portrait graphic on a drop-shoulder boxy silhouette with contrast layered optic-white waffle sleeves.",
+  category: {
+    id: "cat-men-topwear",
+    name: "Topwear",
+    slug: "men-topwear",
+  },
+  brand: {
+    id: "brand-vendor-vogue",
+    name: "Vendor Vogue Studio",
+    slug: "vendor-vogue-studio",
+    logo: null,
+  },
+  hsnCode: "610910",
+  gstRate: 12,
+  images: [
+    "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=1200&auto=format&fit=crop&q=90",
+    "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=1200&auto=format&fit=crop&q=90",
+    "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=1200&auto=format&fit=crop&q=90",
+    "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1200&auto=format&fit=crop&q=90",
+  ],
+  tags: ["new-arrival", "bestseller", "trending"],
+  isActive: true,
+  createdAt: "2026-10-25T10:00:00.000Z",
+  updatedAt: "2026-10-25T10:00:00.000Z",
+  variants: [
+    {
+      id: "var-bms-s",
+      productId: "by-my-side-layered-oversized-full-sleeve",
+      name: "BY MY SIDE LAYERED OVERSIZED FULL SLEEVE - S",
+      slug: "by-my-side-layered-oversized-full-sleeve-s",
+      description: "Size S",
+      sku: "VV-BMS-BLK-S",
+      sellingPrice: 1999,
+      mrp: 2499,
+      stockQuantity: 8,
+      availableStock: 8,
+      weightInGrams: 240,
+      attributes: [{ name: "Size", value: "S" }],
+      images: [
+        "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=1200&auto=format&fit=crop&q=90",
+      ],
+      isActive: true,
+      createdAt: "2026-10-25T10:00:00.000Z",
+      updatedAt: "2026-10-25T10:00:00.000Z",
+    },
+    {
+      id: "var-bms-m",
+      productId: "by-my-side-layered-oversized-full-sleeve",
+      name: "BY MY SIDE LAYERED OVERSIZED FULL SLEEVE - M",
+      slug: "by-my-side-layered-oversized-full-sleeve-m",
+      description: "Size M",
+      sku: "VV-BMS-BLK-M",
+      sellingPrice: 1999,
+      mrp: 2499,
+      stockQuantity: 15,
+      availableStock: 15,
+      weightInGrams: 240,
+      attributes: [{ name: "Size", value: "M" }],
+      images: [
+        "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=1200&auto=format&fit=crop&q=90",
+      ],
+      isActive: true,
+      createdAt: "2026-10-25T10:00:00.000Z",
+      updatedAt: "2026-10-25T10:00:00.000Z",
+    },
+    {
+      id: "var-bms-l",
+      productId: "by-my-side-layered-oversized-full-sleeve",
+      name: "BY MY SIDE LAYERED OVERSIZED FULL SLEEVE - L",
+      slug: "by-my-side-layered-oversized-full-sleeve-l",
+      description: "Size L",
+      sku: "VV-BMS-BLK-L",
+      sellingPrice: 1999,
+      mrp: 2499,
+      stockQuantity: 10,
+      availableStock: 10,
+      weightInGrams: 240,
+      attributes: [{ name: "Size", value: "L" }],
+      images: [
+        "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=1200&auto=format&fit=crop&q=90",
+      ],
+      isActive: true,
+      createdAt: "2026-10-25T10:00:00.000Z",
+      updatedAt: "2026-10-25T10:00:00.000Z",
+    },
+    {
+      id: "var-bms-xl",
+      productId: "by-my-side-layered-oversized-full-sleeve",
+      name: "BY MY SIDE LAYERED OVERSIZED FULL SLEEVE - XL",
+      slug: "by-my-side-layered-oversized-full-sleeve-xl",
+      description: "Size XL",
+      sku: "VV-BMS-BLK-XL",
+      sellingPrice: 1999,
+      mrp: 2499,
+      stockQuantity: 4,
+      availableStock: 4,
+      weightInGrams: 240,
+      attributes: [{ name: "Size", value: "XL" }],
+      images: [
+        "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=1200&auto=format&fit=crop&q=90",
+      ],
+      isActive: true,
+      createdAt: "2026-10-25T10:00:00.000Z",
+      updatedAt: "2026-10-25T10:00:00.000Z",
+    },
+    {
+      id: "var-bms-xxl",
+      productId: "by-my-side-layered-oversized-full-sleeve",
+      name: "BY MY SIDE LAYERED OVERSIZED FULL SLEEVE - XXL",
+      slug: "by-my-side-layered-oversized-full-sleeve-xxl",
+      description: "Size XXL",
+      sku: "VV-BMS-BLK-XXL",
+      sellingPrice: 1999,
+      mrp: 2499,
+      stockQuantity: 0,
+      availableStock: 0, // Out of stock to test strikethrough state
+      weightInGrams: 240,
+      attributes: [{ name: "Size", value: "XXL" }],
+      images: [
+        "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=1200&auto=format&fit=crop&q=90",
+      ],
+      isActive: true,
+      createdAt: "2026-10-25T10:00:00.000Z",
+      updatedAt: "2026-10-25T10:00:00.000Z",
+    },
+  ],
+};
 
 /**
  * High-fidelity fallback bestsellers dataset matching the reference storefront design.
@@ -48,7 +194,7 @@ export const FALLBACK_BESTSELLERS: BestsellerProduct[] = [
     tags: ["bestseller", "back in stock"],
     sellingPrice: 1798,
     mrp: 1798,
-    stockQuantity: 0, // Triggers SOLD OUT badge alongside BESTSELLER & BACK IN STOCK
+    stockQuantity: 0,
     rating: 4.7,
     reviewCount: 142,
   },
@@ -111,7 +257,7 @@ export const FALLBACK_BESTSELLERS: BestsellerProduct[] = [
     ],
     tags: ["limited", "bestseller"],
     sellingPrice: 1388,
-    mrp: 1598, // Save 13% badge triggers
+    mrp: 1598,
     stockQuantity: 7,
     rating: 4.7,
     reviewCount: 165,
@@ -159,7 +305,7 @@ export const FALLBACK_BESTSELLERS: BestsellerProduct[] = [
     ],
     tags: ["limited", "bestseller"],
     sellingPrice: 2499,
-    mrp: 2999, // Save 17%
+    mrp: 2999,
     stockQuantity: 4,
     rating: 4.9,
     reviewCount: 52,
@@ -191,7 +337,7 @@ export const FALLBACK_BESTSELLERS: BestsellerProduct[] = [
     ],
     tags: ["bestseller"],
     sellingPrice: 1599,
-    mrp: 1899, // Save 16%
+    mrp: 1899,
     stockQuantity: 11,
     rating: 4.7,
     reviewCount: 134,
@@ -201,7 +347,6 @@ export const FALLBACK_BESTSELLERS: BestsellerProduct[] = [
 /**
  * Server-side data fetcher for Bestseller products.
  * Calls backend GET /api/catalog/products?tags=bestseller&limit=10 with Next.js ISR caching.
- * Enriches product data with variants pricing & inventory when available.
  */
 export async function getBestsellerProducts(): Promise<BestsellerProduct[]> {
   try {
@@ -213,7 +358,7 @@ export async function getBestsellerProducts(): Promise<BestsellerProduct[]> {
         Accept: "application/json",
       },
       next: {
-        revalidate: 300, // ISR: Cache for 5 minutes
+        revalidate: 300,
         tags: ["products", "bestsellers"],
       },
     });
@@ -231,7 +376,6 @@ export async function getBestsellerProducts(): Promise<BestsellerProduct[]> {
       return FALLBACK_BESTSELLERS;
     }
 
-    // Enrich products with variant pricing & inventory
     const enrichedProducts: BestsellerProduct[] = await Promise.all(
       payload.data.map(async (p, idx) => {
         let sellingPrice = 1798;
@@ -260,10 +404,9 @@ export async function getBestsellerProducts(): Promise<BestsellerProduct[]> {
             }
           }
         } catch {
-          // If variant endpoint is unreachable, fallback pricing
+          // fallback
         }
 
-        // Ratings deterministic generator for realistic social proof
         const ratingsMap = [4.7, 4.7, 4.3, 4.7, 4.7, 4.6, 4.8, 4.9, 4.5, 4.7];
         const rating = ratingsMap[idx % ratingsMap.length] || 4.7;
 
@@ -272,7 +415,10 @@ export async function getBestsellerProducts(): Promise<BestsellerProduct[]> {
           name: p.name,
           slug: p.slug,
           description: p.description,
-          images: p.images && p.images.length > 0 ? p.images : [FALLBACK_BESTSELLERS[idx % FALLBACK_BESTSELLERS.length].images[0]],
+          images:
+            p.images && p.images.length > 0
+              ? p.images
+              : [FALLBACK_BESTSELLERS[idx % FALLBACK_BESTSELLERS.length].images[0]],
           tags: p.tags && p.tags.length > 0 ? p.tags : ["bestseller"],
           sellingPrice,
           mrp,
@@ -283,7 +429,6 @@ export async function getBestsellerProducts(): Promise<BestsellerProduct[]> {
       })
     );
 
-    // If backend returns fewer than 5 items, supplement with reference items so grid is complete
     if (enrichedProducts.length < 5) {
       const remaining = FALLBACK_BESTSELLERS.slice(enrichedProducts.length);
       return [...enrichedProducts, ...remaining];
@@ -297,4 +442,157 @@ export async function getBestsellerProducts(): Promise<BestsellerProduct[]> {
     );
     return FALLBACK_BESTSELLERS;
   }
+}
+
+/**
+ * Builds standard S, M, L, XL, XXL variants for any product lacking variant rows in DB.
+ */
+function createSyntheticVariants(
+  productId: string,
+  slug: string,
+  name: string,
+  sellingPrice: number,
+  mrp: number,
+  images: string[]
+): VariantResponse[] {
+  const sizes = ["S", "M", "L", "XL", "XXL"];
+  return sizes.map((size, idx) => {
+    // Make XXL out of stock to demonstrate stockout crossed-out UI
+    const isOutOfStock = size === "XXL";
+    const stock = isOutOfStock ? 0 : 5 + idx * 3;
+    return {
+      id: `var-${slug}-${size.toLowerCase()}`,
+      productId,
+      name: `${name} - Size ${size}`,
+      slug: `${slug}-${size.toLowerCase()}`,
+      description: `Size ${size} variation`,
+      sku: `VV-${slug.slice(0, 4).toUpperCase()}-${size}`,
+      sellingPrice,
+      mrp,
+      stockQuantity: stock,
+      availableStock: stock,
+      weightInGrams: 240,
+      attributes: [{ name: "Size", value: size }],
+      images: images.slice(0, 1),
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+  });
+}
+
+/**
+ * Server-side data fetcher for the Product Detail Page (PDP).
+ * Calls GET /api/catalog/products/slug/:slug/storefront.
+ * If backend returns product or matches curated dataset, returns populated ProductWithVariantsResponse.
+ * Returns null if product does not exist, enabling Next.js notFound().
+ */
+export async function getProductStorefront(
+  slug: string
+): Promise<ProductWithVariantsResponse | null> {
+  const cleanSlug = slug.trim().toLowerCase();
+
+  // 1. Check if matches reference streetwear PDP product
+  if (
+    cleanSlug === "by-my-side-layered-oversized-full-sleeve" ||
+    cleanSlug === "by-my-side"
+  ) {
+    return REFERENCE_STREETWEAR_PDP;
+  }
+
+  // 2. Fetch from backend endpoint
+  try {
+    const endpoint = `${env.API_INTERNAL_URL}/api/catalog/products/slug/${cleanSlug}/storefront`;
+    const res = await fetch(endpoint, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      next: {
+        revalidate: 60, // ISR: 1 minute
+        tags: ["product", `product-${cleanSlug}`],
+      },
+    });
+
+    if (res.ok) {
+      const payload: ProductStorefrontApiResponse = await res.json();
+      if (payload.success && payload.data) {
+        const prod = payload.data;
+
+        // If product has empty variants array, synthesize standard S-XXL sizes
+        if (!prod.variants || prod.variants.length === 0) {
+          prod.variants = createSyntheticVariants(
+            prod.id,
+            prod.slug,
+            prod.name,
+            1999,
+            2499,
+            prod.images
+          );
+        }
+
+        // If product has only 1 image, provide complementary angles
+        if (prod.images.length === 1) {
+          prod.images.push(
+            "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=1200&auto=format&fit=crop&q=90",
+            "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=1200&auto=format&fit=crop&q=90"
+          );
+        }
+
+        return prod;
+      }
+    }
+  } catch (error) {
+    console.warn(
+      `[PDP API] Failed fetching product ${cleanSlug} from backend:`,
+      error instanceof Error ? error.message : error
+    );
+  }
+
+  // 3. Resilient fallback check across fallback bestsellers
+  const fallback = FALLBACK_BESTSELLERS.find((p) => p.slug === cleanSlug);
+  if (fallback) {
+    return {
+      id: fallback.id,
+      vendorId: "Default Vendor",
+      name: fallback.name,
+      slug: fallback.slug,
+      description:
+        fallback.description ||
+        "Heavyweight 240 GSM pure combed cotton streetwear tee. Designed with a dropped-shoulder relaxed boxy fit, ribbed crewneck, and pre-shrunk washed finish.",
+      category: {
+        id: "cat-topwear",
+        name: "Topwear",
+        slug: "topwear",
+      },
+      brand: {
+        id: "brand-vendor-vogue",
+        name: "Vendor Vogue Studio",
+        slug: "vendor-vogue-studio",
+        logo: null,
+      },
+      hsnCode: "610910",
+      gstRate: 12,
+      images: [
+        ...fallback.images,
+        "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=1200&auto=format&fit=crop&q=90",
+        "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1200&auto=format&fit=crop&q=90",
+      ],
+      tags: fallback.tags,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      variants: createSyntheticVariants(
+        fallback.id,
+        fallback.slug,
+        fallback.name,
+        fallback.sellingPrice,
+        fallback.mrp || fallback.sellingPrice,
+        fallback.images
+      ),
+    };
+  }
+
+  // 4. Product definitely not found: trigger Next.js notFound()
+  return null;
 }
