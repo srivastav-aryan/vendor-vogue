@@ -7,7 +7,6 @@ import { getStorefrontNavigation } from "@/lib/api/categories";
 import { getProductStorefront } from "@/lib/api/products";
 import { ProductGallery } from "@/components/pdp/product-gallery";
 import { ProductInfoPanel } from "@/components/pdp/product-info-panel";
-import { InfiniteMarquee } from "@/components/common/infinite-marquee";
 
 export const revalidate = 60; // ISR cache for 1 minute
 
@@ -134,9 +133,6 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
           </div>
         </div>
       </main>
-
-      {/* Infinite Brand Marquee Banner (react-fast-marquee) */}
-      <InfiniteMarquee text="Vendor Vogue™" />
     </div>
   );
 }
