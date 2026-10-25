@@ -1,20 +1,22 @@
 import { StorefrontLanding } from "@/components/home/storefront-landing";
 import { getStorefrontNavigation } from "@/lib/api/categories";
-import { getBestsellerProducts } from "@/lib/api/products";
+import { getBestsellerProducts, getTrendingProducts } from "@/lib/api/products";
 
 export const revalidate = 300; // Cache page for 5 minutes (ISR)
 
 export default async function HomePage() {
-  // Fetch category tree and bestseller products in parallel on the server
-  const [navItems, bestsellers] = await Promise.all([
+  // Fetch category tree, bestsellers, and trending products in parallel on the server
+  const [navItems, bestsellers, trending] = await Promise.all([
     getStorefrontNavigation(),
     getBestsellerProducts(),
+    getTrendingProducts(),
   ]);
 
   return (
     <StorefrontLanding
       navItems={navItems}
       initialBestsellers={bestsellers}
+      initialTrending={trending}
     />
   );
 }

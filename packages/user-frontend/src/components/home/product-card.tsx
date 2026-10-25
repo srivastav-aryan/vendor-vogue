@@ -32,11 +32,15 @@ export function ProductCard({ product, className, priority = false }: ProductCar
     badges.push({ text: "BESTSELLER", variant: "black" });
   }
 
-  // 3. BACK IN STOCK
+  // 3. TRENDING
+  if (tagsLower.includes("trending")) {
+    badges.push({ text: "TRENDING", variant: "black" });
+  }
+
+  // 4. BACK IN STOCK
   if (
     tagsLower.includes("back in stock") ||
-    tagsLower.includes("back-in-stock") ||
-    tagsLower.includes("trending")
+    tagsLower.includes("back-in-stock")
   ) {
     // Only display back in stock if inventory is available
     if (product.stockQuantity > 0) {

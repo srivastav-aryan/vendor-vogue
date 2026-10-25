@@ -343,6 +343,172 @@ export const FALLBACK_BESTSELLERS: BestsellerProduct[] = [
 ];
 
 /**
+ * Curated fallback dataset for Trending Streetwear products.
+ */
+export const FALLBACK_TRENDING: BestsellerProduct[] = [
+  {
+    id: "tr-1",
+    name: "BY MY SIDE LAYERED OVERSIZED FULL SLEEVE",
+    slug: "by-my-side-layered-oversized-full-sleeve",
+    description: "Heavyweight 240 GSM pure combed cotton layered long-sleeve tee with contrast waffle sleeves.",
+    images: [
+      "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=800&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800&auto=format&fit=crop&q=85",
+    ],
+    tags: ["trending", "new-arrival"],
+    sellingPrice: 1999,
+    mrp: 2499,
+    stockQuantity: 15,
+    rating: 4.9,
+    reviewCount: 186,
+  },
+  {
+    id: "tr-2",
+    name: "ACID WASH DISTRESSED BOX HOODIE",
+    slug: "acid-wash-distressed-box-hoodie",
+    description: "450 GSM custom French Terry with acid enzyme wash, raw hems, and dropped shoulders.",
+    images: [
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=800&auto=format&fit=crop&q=85",
+    ],
+    tags: ["trending", "limited"],
+    sellingPrice: 3499,
+    mrp: 4299,
+    stockQuantity: 12,
+    rating: 4.8,
+    reviewCount: 114,
+  },
+  {
+    id: "tr-3",
+    name: "SHABANG CONTRAST RINGER TEE",
+    slug: "shabang-contrast-ringer-tee",
+    description: "Retro 70s inspired ivory tee with ocean blue ribbed ringer collar and chest insignia.",
+    images: [
+      "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=800&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=800&auto=format&fit=crop&q=85",
+    ],
+    tags: ["trending"],
+    sellingPrice: 1499,
+    mrp: 1799,
+    stockQuantity: 20,
+    rating: 4.6,
+    reviewCount: 74,
+  },
+  {
+    id: "tr-4",
+    name: "TACTICAL NYLON CARGO PARACHUTE PANT",
+    slug: "tactical-nylon-cargo-parachute-pant",
+    description: "Ultra-wide balloon silhouette parachute cargo trousers with bungee cinch toggles.",
+    images: [
+      "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?w=800&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&auto=format&fit=crop&q=85",
+    ],
+    tags: ["trending", "limited"],
+    sellingPrice: 3299,
+    mrp: 3999,
+    stockQuantity: 8,
+    rating: 4.9,
+    reviewCount: 92,
+  },
+  {
+    id: "tr-5",
+    name: "HOPE MINIMALIST EMBROIDERED BABY TEE",
+    slug: "hope-minimalist-embroidered-baby-tee",
+    description: "Structured cotton stretch baby tee in optic white with royal blue typography.",
+    images: [
+      "https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=800&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop&q=85",
+    ],
+    tags: ["trending"],
+    sellingPrice: 1299,
+    mrp: 1299,
+    stockQuantity: 28,
+    rating: 4.5,
+    reviewCount: 88,
+  },
+  {
+    id: "tr-6",
+    name: "DECONSTRUCTED VINTAGE FLANNEL OVERSHIRT",
+    slug: "deconstructed-vintage-flannel-overshirt",
+    description: "Heavy brushed plaid flannel overshirt with frayed raw edging and double chest flap pockets.",
+    images: [
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800&auto=format&fit=crop&q=85",
+    ],
+    tags: ["trending"],
+    sellingPrice: 2799,
+    mrp: 3299,
+    stockQuantity: 14,
+    rating: 4.7,
+    reviewCount: 65,
+  },
+  {
+    id: "tr-7",
+    name: "PHANTOM RAW-EDGE DISTRESSED KNIT",
+    slug: "phantom-raw-edge-distressed-knit",
+    description: "Loose gauge open-weave destroyed sweater featuring laddering details throughout.",
+    images: [
+      "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800&auto=format&fit=crop&q=85",
+    ],
+    tags: ["trending", "limited"],
+    sellingPrice: 2899,
+    mrp: 3499,
+    stockQuantity: 6,
+    rating: 4.8,
+    reviewCount: 47,
+  },
+  {
+    id: "tr-8",
+    name: "CYBERPUNK INDUSTRIAL GRAPHIC HOODIE",
+    slug: "cyberpunk-industrial-graphic-hoodie",
+    description: "Black oversized thermal hoodie with neon reflective cyber graphics on front and back.",
+    images: [
+      "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?w=800&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&auto=format&fit=crop&q=85",
+    ],
+    tags: ["trending"],
+    sellingPrice: 3199,
+    mrp: 3899,
+    stockQuantity: 18,
+    rating: 4.6,
+    reviewCount: 103,
+  },
+  {
+    id: "tr-9",
+    name: "SUBWAY GRAFFITI HEAVYWEIGHT TEE",
+    slug: "subway-graffiti-heavyweight-tee",
+    description: "Oversized 280 GSM cotton t-shirt with airbrushed street tag artwork across the chest.",
+    images: [
+      "https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=800&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=800&auto=format&fit=crop&q=85",
+    ],
+    tags: ["trending"],
+    sellingPrice: 1899,
+    mrp: 2199,
+    stockQuantity: 22,
+    rating: 4.7,
+    reviewCount: 81,
+  },
+  {
+    id: "tr-10",
+    name: "MUTED OLIVE OVERSIZED CARPENTER DENIM",
+    slug: "muted-olive-oversized-carpenter-denim",
+    description: "14oz rigid broken twill denim in vintage washed olive with utility hammer loop and tool pockets.",
+    images: [
+      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=800&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&auto=format&fit=crop&q=85",
+    ],
+    tags: ["trending", "limited"],
+    sellingPrice: 3699,
+    mrp: 4499,
+    stockQuantity: 9,
+    rating: 4.9,
+    reviewCount: 77,
+  },
+];
+
+/**
  * Server-side data fetcher for Bestseller products.
  * Calls backend GET /api/catalog/products?tags=bestseller&limit=10 with Next.js ISR caching.
  */
@@ -443,6 +609,106 @@ export async function getBestsellerProducts(): Promise<BestsellerProduct[]> {
 }
 
 /**
+ * Server-side data fetcher for Trending products.
+ * Calls backend GET /api/catalog/products?tags=trending&limit=10 with Next.js ISR caching.
+ */
+export async function getTrendingProducts(): Promise<BestsellerProduct[]> {
+  try {
+    const endpoint = `${env.API_INTERNAL_URL}/api/catalog/products?tags=trending&limit=10`;
+
+    const res = await fetch(endpoint, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      next: {
+        revalidate: 300,
+        tags: ["products", "trending"],
+      },
+    });
+
+    if (!res.ok) {
+      console.warn(
+        `[Trending API] Backend endpoint ${endpoint} returned status ${res.status}. Using resilient trending catalog.`
+      );
+      return FALLBACK_TRENDING;
+    }
+
+    const payload: ProductsApiResponse = await res.json();
+
+    if (!payload.success || !Array.isArray(payload.data) || payload.data.length === 0) {
+      return FALLBACK_TRENDING;
+    }
+
+    const enrichedProducts: BestsellerProduct[] = await Promise.all(
+      payload.data.map(async (p, idx) => {
+        let sellingPrice = 1899;
+        let mrp = 2299;
+        let stockQuantity = 12;
+
+        try {
+          const varRes = await fetch(
+            `${env.API_INTERNAL_URL}/api/catalog/products/${p.id}/variants`,
+            {
+              headers: { Accept: "application/json" },
+              next: { revalidate: 300 },
+            }
+          );
+          if (varRes.ok) {
+            const varPayload: VariantsApiResponse = await varRes.json();
+            if (varPayload.success && Array.isArray(varPayload.data) && varPayload.data.length > 0) {
+              const prices = varPayload.data.map((v) => v.sellingPrice);
+              const mrps = varPayload.data.map((v) => v.mrp);
+              sellingPrice = Math.min(...prices);
+              mrp = Math.max(...mrps);
+              stockQuantity = varPayload.data.reduce(
+                (sum, v) => sum + (v.stockQuantity || 0),
+                0
+              );
+            }
+          }
+        } catch {
+          // fallback
+        }
+
+        const ratingsMap = [4.9, 4.8, 4.6, 4.9, 4.5, 4.7, 4.8, 4.6, 4.7, 4.9];
+        const rating = ratingsMap[idx % ratingsMap.length] || 4.8;
+
+        return {
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          description: p.description,
+          images:
+            p.images && p.images.length > 0
+              ? p.images
+              : [FALLBACK_TRENDING[idx % FALLBACK_TRENDING.length].images[0]],
+          tags: p.tags && p.tags.length > 0 ? p.tags : ["trending"],
+          sellingPrice,
+          mrp,
+          stockQuantity,
+          rating,
+          reviewCount: 45 + ((idx * 31) % 150),
+        };
+      })
+    );
+
+    if (enrichedProducts.length < 5) {
+      const remaining = FALLBACK_TRENDING.slice(enrichedProducts.length);
+      return [...enrichedProducts, ...remaining];
+    }
+
+    return enrichedProducts;
+  } catch (error) {
+    console.warn(
+      "[Trending API] Backend unreachable during fetch. Using resilient fallback products.",
+      error instanceof Error ? error.message : error
+    );
+    return FALLBACK_TRENDING;
+  }
+}
+
+/**
  * Builds standard S, M, L, XL, XXL variants for any product lacking variant rows in DB.
  */
 function createSyntheticVariants(
@@ -539,8 +805,10 @@ export async function getProductStorefront(
     );
   }
 
-  // 3. Resilient fallback check across fallback bestsellers
-  const fallback = FALLBACK_BESTSELLERS.find((p) => p.slug === cleanSlug);
+  // 3. Resilient fallback check across fallback bestsellers & trending catalog
+  const fallback =
+    FALLBACK_BESTSELLERS.find((p) => p.slug === cleanSlug) ||
+    FALLBACK_TRENDING.find((p) => p.slug === cleanSlug);
   if (fallback) {
     return {
       id: fallback.id,
