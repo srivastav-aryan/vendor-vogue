@@ -35,7 +35,7 @@ export function DiscoverCampaignSection({
         fill
         loading="lazy"
         sizes="100vw"
-        quality={88}
+        quality={90}
         className="object-cover object-center transform-gpu"
       />
 

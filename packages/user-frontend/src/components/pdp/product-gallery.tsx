@@ -171,7 +171,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 src={displayImages[activeImageIndex]}
                 alt={`${productName} enlarged view`}
                 fill
-                quality={95}
+                quality={90}
                 sizes="90vw"
                 className="object-contain object-center"
               />
