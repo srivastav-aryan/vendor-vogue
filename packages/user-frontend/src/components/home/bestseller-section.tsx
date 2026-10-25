@@ -190,7 +190,7 @@ export function BestsellerSection({
               <ProductCard
                 key={product.id || product.slug}
                 product={product}
-                priority={idx < 5}
+                priority={idx < 2}
               />
             ))}
           </div>

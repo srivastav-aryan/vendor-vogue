@@ -5,8 +5,10 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 interface CampaignBannerVideoProps {
-  videoSrc?: string;
+  desktopVideoSrc?: string;
+  mobileVideoSrc?: string;
   posterSrc?: string;
+  mobilePosterSrc?: string;
   tagline?: string;
   title?: string;
   subtitle?: string;
@@ -16,8 +18,10 @@ interface CampaignBannerVideoProps {
 }
 
 export function CampaignBannerVideo({
-  videoSrc = "/videos/banner.mp4?v=1080p",
-  posterSrc = "/videos/banner-poster.jpg?v=1080p",
+  desktopVideoSrc = "/videos/banner.mp4?v=faststart",
+  mobileVideoSrc = "/videos/banner-mobile.mp4?v=faststart",
+  posterSrc = "/videos/banner-poster.jpg?v=1",
+  mobilePosterSrc = "/videos/banner-poster-mobile.jpg?v=1",
   tagline = "AUTUMN / WINTER 2026",
   title = "CHAOS IN SILENCE",
   subtitle = "Heavyweight drape and raw architectural silhouettes engineered for the streetwear vanguard.",
@@ -25,66 +29,93 @@ export function CampaignBannerVideo({
   ctaHref = "/catalog?filter=trending",
   className,
 }: CampaignBannerVideoProps) {
+  const containerRef = React.useRef<HTMLElement>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
+  const [activePoster, setActivePoster] = React.useState(posterSrc);
+  const hasLoadedSrcRef = React.useRef(false);
 
+  // Set lightweight mobile poster on small screens
   React.useEffect(() => {
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches) {
+      setActivePoster(mobilePosterSrc);
+    }
+  }, [mobilePosterSrc]);
+
+  // Robust Proximity & Playback Observer:
+  // - Starts with preload="none" and NO video source, so initial Lighthouse/FCP download is 0 KB.
+  // - Once the user scrolls within 250px of the banner, assigns the appropriate stream (1.9MB on mobile, 7.4MB faststart on desktop).
+  // - Automatically pauses when scrolled away to completely eliminate background CPU/GPU lag.
+  React.useEffect(() => {
+    const container = containerRef.current;
     const video = videoRef.current;
-    if (!video) return;
+    if (!container || !video) return;
 
-    // Force load the new video stream to bypass any browser cache of previous iterations
-    video.load();
-
-    // Use IntersectionObserver to pause video when scrolled out of view and play when entering viewport
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const playPromise = video.play();
-            if (playPromise !== undefined) {
-              playPromise.catch(() => {
-                // Autoplay policy or abort; fail silently
-              });
-            }
-          } else {
+        const entry = entries[0];
+        if (!entry) return;
+
+        if (entry.isIntersecting) {
+          // 1. Lazy load stream on first near-viewport scroll
+          if (!hasLoadedSrcRef.current) {
+            hasLoadedSrcRef.current = true;
+            const isMobile = window.matchMedia("(max-width: 768px)").matches;
+            video.src = isMobile ? mobileVideoSrc : desktopVideoSrc;
+            video.load();
+          }
+
+          // 2. Play safely
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {
+              // Autoplay policy or abort; fail silently without console noise
+            });
+          }
+        } else {
+          // Pause when scrolled out of view to avoid Chrome frame drops
+          if (hasLoadedSrcRef.current && !video.paused) {
             video.pause();
           }
-        });
+        }
       },
       {
-        threshold: 0.15, // Trigger when 15% of banner is visible
+        rootMargin: "250px 0px",
+        threshold: 0.05,
       }
     );
 
-    observer.observe(video);
+    observer.observe(container);
 
     return () => {
       observer.disconnect();
     };
-  }, [videoSrc]);
+  }, [desktopVideoSrc, mobileVideoSrc]);
 
   return (
     <section
+      ref={containerRef}
       aria-label="Campaign Banner Video"
-      className={`relative w-full overflow-hidden select-none bg-black h-[300px] sm:h-[380px] md:h-[460px] lg:h-[540px] xl:h-[600px] flex items-center justify-center ${
+      className={`relative w-full overflow-hidden select-none bg-black h-[300px] sm:h-[380px] md:h-[460px] lg:h-[540px] xl:h-[600px] flex items-center justify-center transform-gpu ${
         className || ""
       }`}
     >
-      {/* Full-width Cinematic Landscape Video with React key to force refresh */}
+      {/* 
+        High-Performance Hardware-Accelerated Video:
+        - preload="none" guarantees ZERO network payload during initial page load
+        - poster image displays immediately with zero layout shift
+      */}
       <video
-        key={videoSrc}
         ref={videoRef}
-        poster={posterSrc}
+        poster={activePoster}
         autoPlay
         muted
         loop
         playsInline
-        preload="metadata"
-        className="w-full h-full object-cover object-center"
-      >
-        <source src={videoSrc} type="video/mp4" />
-      </video>
+        preload="none"
+        className="w-full h-full object-cover object-center will-change-transform"
+      />
 
-      {/* Cinematic Dark Scrim Overlay for Pristine Typography Contrast */}
+      {/* Cinematic Dark Scrim Overlay for Typography Contrast */}
       <div
         className="absolute inset-0 bg-black/45 pointer-events-none"
         aria-hidden="true"

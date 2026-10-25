@@ -110,6 +110,7 @@ export function ProductCard({ product, className, priority = false }: ProductCar
             alt={product.name}
             fill
             priority={priority}
+            loading={priority ? "eager" : "lazy"}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
             onError={() => setImageError(true)}
             className={cn(
@@ -120,12 +121,13 @@ export function ProductCard({ product, className, priority = false }: ProductCar
             )}
           />
 
-          {/* Hover Image Swap: Smoothly reveals secondary image if available */}
+          {/* Hover Image Swap: Smoothly reveals secondary image if available (lazy on mobile) */}
           {hasSecondaryImage && (
             <Image
               src={product.images[1]}
               alt={`${product.name} alternate angle`}
               fill
+              loading="lazy"
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
               className="object-cover object-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             />

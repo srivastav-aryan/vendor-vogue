@@ -20,13 +20,18 @@ export function Hero({
     ...config,
   };
 
+  const lastPastRef = React.useRef(false);
+
   React.useEffect(() => {
     if (!onScrollThresholdChange) return;
 
     const handleScroll = () => {
       // Trigger white header once scrolled past threshold
       const isPast = window.scrollY > 40;
-      onScrollThresholdChange(isPast);
+      if (lastPastRef.current !== isPast) {
+        lastPastRef.current = isPast;
+        onScrollThresholdChange(isPast);
+      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });

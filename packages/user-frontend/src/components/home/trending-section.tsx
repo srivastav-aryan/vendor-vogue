@@ -182,11 +182,11 @@ export function TrendingSection({ initialProducts }: TrendingSectionProps) {
           </div>
         ) : products.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-12">
-            {products.map((product, idx) => (
+            {products.map((product) => (
               <ProductCard
                 key={product.id || product.slug}
                 product={product}
-                priority={idx < 5}
+                priority={false}
               />
             ))}
           </div>
