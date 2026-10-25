@@ -77,6 +77,7 @@ export function Hero({
             <img
               src={mergedConfig.imageSrc}
               alt="Vendor Vogue Autumn/Winter 2026 Campaign"
+              loading="eager"
               fetchPriority="high"
               decoding="async"
               className="w-full h-full object-cover object-[center_28%] sm:object-[center_25%] md:object-center transition-transform duration-1000 ease-out will-change-transform"
@@ -85,68 +86,58 @@ export function Hero({
         )}
       </div>
 
-      {/* Cinematic Edge Vignette */}
+      {/* Subtle Top Gradient strictly for Floating Navigation Legibility */}
       <div
-        className="cinematic-vignette absolute inset-0 pointer-events-none z-10"
+        className="absolute top-0 left-0 w-full h-28 bg-gradient-to-b from-black/45 via-black/15 to-transparent pointer-events-none z-10"
         aria-hidden="true"
       />
 
-      {/* Subtle Top Gradient for Floating Navigation Legibility */}
+      {/* Low Bottom Gradient strictly behind the bottom typography (leaves 100% of the middle clear) */}
       <div
-        className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-black/55 via-black/20 to-transparent pointer-events-none z-10"
-        aria-hidden="true"
-      />
-
-      {/* Very Subtle Cinematic Black Gradient toward Bottom to anchor typography without dimming model */}
-      <div
-        className="hero-bottom-gradient absolute inset-x-0 bottom-0 h-3/5 pointer-events-none z-10"
-        aria-hidden="true"
-      />
-
-      {/* Fine Editorial Film Grain Overlay */}
-      <div
-        className="film-grain absolute inset-0 mix-blend-overlay opacity-60 pointer-events-none z-10"
+        className="absolute inset-x-0 bottom-0 h-40 sm:h-52 bg-gradient-to-t from-black/75 via-black/25 to-transparent pointer-events-none z-10"
         aria-hidden="true"
       />
 
       {/* Main Editorial Hero Typography & Elements */}
       {showEditorialOverlay && (
-        <div className="relative z-20 h-full w-full flex flex-col justify-end px-6 sm:px-12 md:px-16 pb-12 sm:pb-14 md:pb-16 pointer-events-none">
-          <div className="w-full flex flex-col sm:flex-row items-start sm:items-end justify-between gap-8">
-            {/* Lower-Left Campaign Typography */}
-            <div className="max-w-2xl pointer-events-auto">
+        <div className="relative z-20 h-full w-full flex flex-col justify-end px-6 sm:px-10 md:px-14 pb-8 sm:pb-12 md:pb-14 pointer-events-none">
+          <div className="w-full flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 sm:gap-8">
+            {/* Lower-Left Campaign Typography (Refined, perfectly balanced) */}
+            <div className="max-w-xl pointer-events-auto">
               {/* Eyebrow */}
-              <p className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.28em] text-white/75 mb-3 sm:mb-4 animate-in fade-in duration-700">
+              <p className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.25em] text-white/80 mb-2 sm:mb-2.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
                 AUTUMN / WINTER 2026
               </p>
 
-              {/* Oversized Headline */}
-              <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[7.25rem] font-black uppercase tracking-[-0.04em] leading-[0.85] text-white select-none drop-shadow-sm">
+              {/* Refined Headline: impactful without dominating the frame */}
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase tracking-[-0.03em] leading-[0.88] text-white select-none drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
                 VENDOR
                 <br />
                 VOGUE
               </h1>
 
               {/* Tagline */}
-              <p className="mt-4 sm:mt-5 text-xs sm:text-sm tracking-[0.25em] font-light text-white/80 uppercase">
+              <p className="mt-2.5 sm:mt-3 text-xs sm:text-sm tracking-[0.22em] font-light text-white/90 uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
                 THE NEW UNIFORM.
               </p>
 
-              {/* Minimal Transparent CTA with Thin White Border */}
-              <div className="mt-7 sm:mt-8">
+              {/* Clean Luxury CTA Button */}
+              <div className="mt-5 sm:mt-6">
                 <Link
                   href={mergedConfig.ctaHref || "/catalog"}
-                  className="inline-flex items-center gap-3 border border-white/45 hover:border-white text-white bg-transparent hover:bg-white hover:text-black px-6 sm:px-8 py-3 sm:py-3.5 text-[11px] sm:text-xs uppercase tracking-[0.25em] font-medium transition-all duration-300 group"
+                  className="group inline-flex items-center gap-2.5 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full bg-white text-black hover:bg-neutral-900 hover:text-white border border-white text-[10px] sm:text-[11px] uppercase tracking-[0.22em] font-bold transition-all duration-300 shadow-[0_8px_25px_rgba(0,0,0,0.4)] hover:scale-105 active:scale-95"
                 >
                   <span>DISCOVER FW26</span>
-                  <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+                  <span className="text-xs font-light transition-transform duration-300 group-hover:translate-x-1">
+                    →
+                  </span>
                 </Link>
               </div>
             </div>
 
             {/* Lower-Right Production Metadata */}
             <div className="pointer-events-auto select-none text-left sm:text-right">
-              <div className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.26em] text-white/55 space-y-1 sm:space-y-1.5 leading-relaxed">
+              <div className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.24em] text-white/70 space-y-1 sm:space-y-1.5 leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
                 <p>FW26 — 01</p>
                 <p>CAMPAIGN / VENDOR VOGUE</p>
                 <p>MUMBAI / 2026</p>

@@ -1,6 +1,3 @@
-"use client";
-
-import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -33,16 +30,9 @@ export function DiscoverCampaignSection({
         src={imageSrc}
         alt={`${brandTitle} - ${tagline}`}
         fill
-        loading="lazy"
         sizes="100vw"
         quality={90}
         className="object-cover object-center transform-gpu"
-      />
-
-      {/* Subtle Cinematic Contrast Overlay matching the reference photo */}
-      <div
-        className="absolute inset-0 bg-black/30 pointer-events-none"
-        aria-hidden="true"
       />
 
       {/* Editorial Content Layer */}
@@ -54,26 +44,29 @@ export function DiscoverCampaignSection({
         <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 md:gap-12 w-full my-auto">
           {/* Left: Brand Title */}
           <div className="text-left">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium uppercase tracking-[0.25em] text-neutral-300/90 leading-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium uppercase tracking-[0.25em] text-white leading-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.65)]">
               {brandTitle}
             </h2>
           </div>
 
           {/* Right: Editorial Tagline */}
           <div className="text-left md:text-right">
-            <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif text-neutral-300/90 tracking-wide font-normal leading-tight">
+            <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif text-white tracking-wide font-normal leading-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.65)]">
               {tagline}
             </p>
           </div>
         </div>
 
-        {/* Bottom Center: Minimalist Monolithic Button */}
+        {/* Bottom Center: Editorial CTA Button */}
         <div className="flex justify-center w-full pt-6 sm:pt-8">
           <Link
             href={buttonHref}
-            className="inline-flex items-center justify-center px-10 sm:px-14 py-3 sm:py-3.5 bg-[#404040]/80 hover:bg-[#525252] text-neutral-200 hover:text-white text-[11px] sm:text-xs font-semibold tracking-[0.25em] uppercase transition-all duration-200 backdrop-blur-xs border border-white/10 hover:border-white/20 active:scale-95"
+            className="group inline-flex items-center gap-2.5 px-8 sm:px-11 py-3 sm:py-3.5 rounded-full bg-white text-black hover:bg-black hover:text-white border border-white text-[11px] sm:text-xs font-bold tracking-[0.25em] uppercase transition-all duration-300 shadow-[0_10px_35px_rgba(0,0,0,0.35)] hover:scale-105 active:scale-95"
           >
-            {buttonText}
+            <span>{buttonText}</span>
+            <span className="text-sm font-light transition-transform duration-300 group-hover:translate-x-1">
+              →
+            </span>
           </Link>
         </div>
       </div>
