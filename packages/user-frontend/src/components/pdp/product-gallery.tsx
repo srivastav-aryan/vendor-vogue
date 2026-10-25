@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import cloudinaryLoader from "@/lib/cloudinary-loader";
 import { Plus, ChevronLeft, ChevronRight, X } from "lucide-react";
 import {
   Dialog,
@@ -28,15 +29,26 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=1200&auto=format&fit=crop&q=90",
         ];
 
-  // Handle mobile scroll index update
+  // Optimized mobile scroll index update (throttled with rAF)
+  const rafIdRef = React.useRef<number | null>(null);
   const handleMobileScroll = () => {
-    if (!mobileScrollRef.current) return;
-    const { scrollLeft, clientWidth } = mobileScrollRef.current;
-    if (clientWidth > 0) {
-      const idx = Math.round(scrollLeft / clientWidth);
-      setMobileActiveIndex(idx);
-    }
+    if (rafIdRef.current) return;
+    rafIdRef.current = requestAnimationFrame(() => {
+      rafIdRef.current = null;
+      if (!mobileScrollRef.current) return;
+      const { scrollLeft, clientWidth } = mobileScrollRef.current;
+      if (clientWidth > 0) {
+        const idx = Math.round(scrollLeft / clientWidth);
+        setMobileActiveIndex((prev) => (prev !== idx ? idx : prev));
+      }
+    });
   };
+
+  React.useEffect(() => {
+    return () => {
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+    };
+  }, []);
 
   const handleNextLightbox = () => {
     if (activeImageIndex === null) return;
@@ -63,11 +75,12 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       >
         {displayImages.map((src, index) => (
           <div
-            key={`desktop-img-${index}`}
+            key={`desktop-img-${src}-${index}`}
             className="group relative aspect-[3/4] w-full overflow-hidden bg-[#f6f6f6] cursor-zoom-in"
             onClick={() => setActiveImageIndex(index)}
           >
             <Image
+              loader={cloudinaryLoader}
               src={src}
               alt={`${productName} view ${index + 1}`}
               fill
@@ -101,11 +114,12 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         >
           {displayImages.map((src, index) => (
             <div
-              key={`mobile-img-${index}`}
+              key={`mobile-img-${src}-${index}`}
               className="relative aspect-[3/4] w-full min-w-full shrink-0 snap-center overflow-hidden bg-[#f6f6f6]"
               onClick={() => setActiveImageIndex(index)}
             >
               <Image
+                loader={cloudinaryLoader}
                 src={src}
                 alt={`${productName} mobile view ${index + 1}`}
                 fill
@@ -168,6 +182,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           {activeImageIndex !== null && (
             <div className="relative aspect-[3/4] max-h-[85vh] w-full overflow-hidden select-none">
               <Image
+                loader={cloudinaryLoader}
                 src={displayImages[activeImageIndex]}
                 alt={`${productName} enlarged view`}
                 fill
