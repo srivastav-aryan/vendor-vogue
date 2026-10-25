@@ -8,7 +8,7 @@ import {
   FALLBACK_TRENDING,
   type ProductsApiResponse,
   type VariantsApiResponse,
-} from "@/lib/api/products";
+} from "@/lib/constants/products";
 
 interface TrendingSectionProps {
   initialProducts?: BestsellerProduct[];

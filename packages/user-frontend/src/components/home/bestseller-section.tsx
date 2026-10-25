@@ -8,7 +8,7 @@ import {
   FALLBACK_BESTSELLERS,
   type ProductsApiResponse,
   type VariantsApiResponse,
-} from "@/lib/api/products";
+} from "@/lib/constants/products";
 
 interface BestsellerSectionProps {
   initialProducts?: BestsellerProduct[];

@@ -3,7 +3,8 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import type { BestsellerProduct } from "@/lib/api/products";
+import cloudinaryLoader from "@/lib/cloudinary-loader";
+import type { BestsellerProduct } from "@/lib/constants/products";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -106,11 +107,11 @@ export function ProductCard({ product, className, priority = false }: ProductCar
         <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#f6f6f6]">
           {/* Primary Product Image */}
           <Image
+            loader={cloudinaryLoader}
             src={primaryImageSrc}
             alt={product.name}
             fill
             priority={priority}
-            loading={priority ? "eager" : "lazy"}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
             onError={() => setImageError(true)}
             className={cn(
@@ -124,6 +125,7 @@ export function ProductCard({ product, className, priority = false }: ProductCar
           {/* Hover Image Swap: Smoothly reveals secondary image if available (lazy on mobile) */}
           {hasSecondaryImage && (
             <Image
+              loader={cloudinaryLoader}
               src={product.images[1]}
               alt={`${product.name} alternate angle`}
               fill
@@ -157,7 +159,14 @@ export function ProductCard({ product, className, priority = false }: ProductCar
         </div>
 
         {/* Product Details Block */}
-        <div className="pt-3 flex flex-col gap-1">
+        <div className="pt-3 flex flex-col gap-0.5">
+          {/* Brand Label: Subtle, luxurious uppercase label */}
+          <span className="text-[10px] md:text-[11px] font-mono uppercase tracking-[0.18em] text-neutral-400 font-semibold block truncate leading-tight">
+            {typeof product.brand === "object"
+              ? product.brand.name
+              : product.brand || "Vendor Vogue Studio"}
+          </span>
+
           {/* Product Title: Bold, uppercase, clean grotesk typography */}
           <h3 className="text-xs md:text-[13px] font-extrabold uppercase tracking-tight text-neutral-900 line-clamp-1 group-hover:text-neutral-600 transition-colors">
             {product.name}
