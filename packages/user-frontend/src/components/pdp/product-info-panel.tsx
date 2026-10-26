@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, Ruler } from "lucide-react";
+import { Check, Ruler, AlertCircle } from "lucide-react";
 import type { ProductWithVariantsResponse, VariantResponse } from "@e-com/shared/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -103,7 +103,13 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
     tagsLower.includes("trending");
   const isBestseller = tagsLower.includes("bestseller");
 
+  const currentAvailableStock =
+    selectedVariant.availableStock ?? selectedVariant.stockQuantity ?? 0;
+  const isCurrentOutOfStock = currentAvailableStock <= 0;
+  const isLowStock = currentAvailableStock > 0 && currentAvailableStock <= 5;
+
   const handleAddToCart = () => {
+    if (isCurrentOutOfStock) return;
     addItem({
       productId: product.id,
       variantId: selectedVariant.id,
@@ -113,12 +119,13 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
       price: sellingPrice,
       mrp: mrp || undefined,
       image: selectedVariant.images?.[0] || product.images?.[0] || "",
-      maxStock: selectedVariant.availableStock ?? selectedVariant.stockQuantity ?? 10,
+      maxStock: currentAvailableStock || 10,
     });
     setToastMessage(`Added "${product.name}" (${selectedSize.toUpperCase()}) to cart`);
   };
 
   const handleBuyNow = () => {
+    if (isCurrentOutOfStock) return;
     handleAddToCart();
   };
 
@@ -231,6 +238,7 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
             const isSelected = v.id === selectedVariant.id;
             const stock = v.availableStock ?? v.stockQuantity ?? 0;
             const isOutOfStock = stock <= 0;
+            const isVariantLow = stock > 0 && stock <= 3;
 
             return (
               <button
@@ -241,7 +249,7 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
                 aria-checked={isSelected}
                 role="radio"
                 className={cn(
-                  "relative min-w-[50px] h-9 px-3.5 flex items-center justify-center text-xs font-semibold uppercase tracking-wider transition-all rounded-xs select-none",
+                  "relative min-w-[52px] h-9 px-3.5 flex items-center justify-center text-xs font-semibold uppercase tracking-wider transition-all rounded-xs select-none",
                   isSelected
                     ? "bg-black text-white border-black shadow-xs"
                     : isOutOfStock
@@ -249,25 +257,79 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
                     : "border border-neutral-300 bg-white text-neutral-900 hover:border-black hover:bg-neutral-50"
                 )}
               >
-                {sizeLabel.toLowerCase()}
+                <span>{sizeLabel.toLowerCase()}</span>
                 {isOutOfStock && (
                   <span
                     aria-hidden="true"
                     className="absolute inset-0 m-auto h-[1px] w-full rotate-[-25deg] bg-neutral-400"
                   />
                 )}
+                {isVariantLow && !isOutOfStock && (
+                  <span
+                    className={cn(
+                      "absolute -top-1.5 -right-1 px-1 py-0.2 text-[8px] font-mono font-bold leading-none rounded-full shadow-2xs",
+                      isSelected
+                        ? "bg-amber-400 text-black"
+                        : "bg-amber-600 text-white"
+                    )}
+                    title={`Only ${stock} left in stock`}
+                  >
+                    {stock}
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
 
-        {/* Stock warning if low */}
-        {(selectedVariant.availableStock ?? selectedVariant.stockQuantity ?? 0) <= 4 &&
-          (selectedVariant.availableStock ?? selectedVariant.stockQuantity ?? 0) > 0 && (
-            <p className="text-[11px] font-medium text-amber-600">
-              Only {selectedVariant.availableStock ?? selectedVariant.stockQuantity} left in stock - order soon.
-            </p>
-          )}
+        {/* Dynamic Stock & Urgency Badge */}
+        {isLowStock ? (
+          <div className="rounded-xs border border-amber-300/90 bg-amber-50/80 p-3 space-y-1.5 transition-all animate-in fade-in duration-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600" />
+                </span>
+                <span className="text-xs font-bold font-mono uppercase tracking-wider text-amber-950">
+                  Only {currentAvailableStock} {currentAvailableStock === 1 ? "piece" : "pieces"} left in Size {selectedSize.toUpperCase()}
+                </span>
+              </div>
+              <span className="text-[10px] font-mono uppercase text-amber-800 font-bold px-1.5 py-0.5 bg-amber-200/70 rounded-[2px]">
+                HIGH DEMAND
+              </span>
+            </div>
+
+            {/* Visual stock urgency indicator bar */}
+            <div className="space-y-1">
+              <div className="h-1 w-full bg-amber-200/70 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-amber-500 transition-all duration-300"
+                  style={{
+                    width: `${Math.max(15, Math.min(100, (currentAvailableStock / 5) * 100))}%`,
+                  }}
+                />
+              </div>
+              <p className="text-[10px] text-amber-800 font-medium font-sans">
+                {currentAvailableStock === 1
+                  ? "Last unit available in atelier inventory. Secure your order before it sells out."
+                  : "Items are selling rapidly. Live reservations hold stock for 15 minutes at checkout."}
+              </p>
+            </div>
+          </div>
+        ) : isCurrentOutOfStock ? (
+          <div className="rounded-xs border border-neutral-200 bg-neutral-100/80 p-3 flex items-center gap-2.5 text-xs text-neutral-600">
+            <AlertCircle className="w-4 h-4 text-neutral-500 shrink-0" />
+            <span className="font-mono uppercase text-[11px] tracking-wide">
+              Size <strong className="text-black font-bold">{selectedSize.toUpperCase()}</strong> is currently out of stock. Please select another size.
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-emerald-700 pt-0.5">
+            <span className="inline-flex rounded-full h-1.5 w-1.5 bg-emerald-600" />
+            <span>IN STOCK IN SIZE {selectedSize.toUpperCase()} — DISPATCHES WITHIN 24 HOURS</span>
+          </div>
+        )}
       </div>
 
       {/* 7. ACTION BUTTONS (Using shadcn Button primitives) */}
@@ -275,19 +337,29 @@ export function ProductInfoPanel({ product }: ProductInfoPanelProps) {
         <Button
           type="button"
           variant="outline"
+          disabled={isCurrentOutOfStock}
           onClick={handleAddToCart}
-          className="h-12 w-full rounded-xs border-neutral-300 bg-neutral-100/80 text-xs sm:text-sm font-semibold uppercase tracking-wider text-neutral-900 hover:bg-neutral-200 hover:text-black active:scale-[0.99] transition-all"
+          className={cn(
+            "h-12 w-full rounded-xs text-xs sm:text-sm font-semibold uppercase tracking-wider transition-all",
+            isCurrentOutOfStock
+              ? "border-neutral-200 bg-neutral-100 text-neutral-400 cursor-not-allowed"
+              : "border-neutral-300 bg-neutral-100/80 text-neutral-900 hover:bg-neutral-200 hover:text-black active:scale-[0.99]"
+          )}
         >
-          add to cart
+          {isCurrentOutOfStock
+            ? `SOLD OUT IN SIZE ${selectedSize.toUpperCase()}`
+            : "add to cart"}
         </Button>
 
-        <Button
-          type="button"
-          onClick={handleBuyNow}
-          className="h-12 w-full rounded-xs bg-black text-xs sm:text-sm font-bold uppercase tracking-wider text-white hover:bg-neutral-900 active:scale-[0.99] transition-all"
-        >
-          buy it now
-        </Button>
+        {!isCurrentOutOfStock && (
+          <Button
+            type="button"
+            onClick={handleBuyNow}
+            className="h-12 w-full rounded-xs bg-black text-xs sm:text-sm font-bold uppercase tracking-wider text-white hover:bg-neutral-900 active:scale-[0.99] transition-all"
+          >
+            buy it now
+          </Button>
+        )}
       </div>
 
       {/* 8. SHIPPING & POLICY FOOTNOTE */}
