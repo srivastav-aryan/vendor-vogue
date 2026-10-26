@@ -40,13 +40,15 @@ export function OrderDetailModal({
 
   if (!isOpen || !order) return null;
 
+  const orderId = order.id || (order as any)._id;
+
   const handleStatusTransition = async (nextStatus: OrderStatusDto, reason?: string) => {
     setIsUpdating(true);
     setError(null);
 
     try {
       const response = await clientApiFetch<OrderDto>(
-        `/api/orders/${order.id}/status`,
+        `/api/orders/${orderId}/status`,
         {
           method: "PATCH",
           body: JSON.stringify({
@@ -119,7 +121,7 @@ export function OrderDetailModal({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-bold text-slate-900 text-base">
-                  Order #{order.id}
+                  Order #{orderId}
                 </h3>
                 {getStatusBadge(order.status)}
               </div>

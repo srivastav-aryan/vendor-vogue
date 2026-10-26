@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { OrderDto, OrderStatusDto } from "@e-com/shared/types";
 import { OrderDetailModal } from "./order-detail-modal";
 import { formatDateTime, formatINR } from "@/lib/utils";
+import { clientApiFetch } from "@/lib/api-client";
 import {
   Search,
   ShoppingBag,
@@ -13,6 +14,8 @@ import {
   Truck,
   XCircle,
   Filter,
+  RefreshCw,
+  Loader2,
 } from "lucide-react";
 
 interface OrderListProps {
@@ -33,6 +36,41 @@ export function OrderList({ initialOrders }: OrderListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("ALL");
   const [selectedOrder, setSelectedOrder] = useState<OrderDto | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Sync state if initialOrders changes via SSR
+  useEffect(() => {
+    if (initialOrders && initialOrders.length > 0) {
+      setOrders(initialOrders);
+    }
+  }, [initialOrders]);
+
+  const loadOrdersFromApi = async () => {
+    setIsLoading(true);
+    try {
+      const res = await clientApiFetch<any>("/api/orders", {
+        params: { limit: 50 },
+      });
+      const data = res.data;
+      const fetchedOrders: OrderDto[] = Array.isArray(data?.orders)
+        ? data.orders
+        : Array.isArray(data)
+        ? data
+        : [];
+      setOrders(fetchedOrders);
+    } catch (err) {
+      console.warn("Client orders fetch:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Run on mount if initialOrders was empty to ensure client hydration
+  useEffect(() => {
+    if (initialOrders.length === 0) {
+      loadOrdersFromApi();
+    }
+  }, []);
 
   const filteredOrders = orders.filter((order) => {
     // Status filter check
@@ -42,7 +80,8 @@ export function OrderList({ initialOrders }: OrderListProps) {
 
     // Search query check
     const q = searchQuery.toLowerCase();
-    const idMatch = (order.id || "").toLowerCase().includes(q);
+    const orderIdStr = (order.id || (order as any)._id || "").toString().toLowerCase();
+    const idMatch = orderIdStr.includes(q);
     const nameMatch = (order.shippingAddress?.name || "").toLowerCase().includes(q);
     const phoneMatch = (order.shippingAddress?.phone || "").toLowerCase().includes(q);
     const cityMatch = (order.shippingAddress?.city || "").toLowerCase().includes(q);
@@ -51,8 +90,9 @@ export function OrderList({ initialOrders }: OrderListProps) {
   });
 
   const handleStatusUpdated = (updatedOrder: OrderDto) => {
+    const updatedId = updatedOrder.id || (updatedOrder as any)._id;
     setOrders((prev) =>
-      prev.map((o) => (o.id === updatedOrder.id ? updatedOrder : o))
+      prev.map((o) => ((o.id || (o as any)._id) === updatedId ? updatedOrder : o))
     );
     setSelectedOrder(updatedOrder);
   };
@@ -119,16 +159,27 @@ export function OrderList({ initialOrders }: OrderListProps) {
           ))}
         </div>
 
-        {/* Search Bar */}
-        <div className="relative w-full lg:w-80">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search ID, customer, city, or phone..."
-            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-xs transition-all"
-          />
+        {/* Search Bar + Refresh Button */}
+        <div className="flex items-center gap-2 w-full lg:w-auto">
+          <button
+            type="button"
+            onClick={loadOrdersFromApi}
+            disabled={isLoading}
+            title="Refresh orders from database"
+            className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-xl shadow-xs transition-all disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin text-emerald-600" : ""}`} />
+          </button>
+          <div className="relative flex-1 lg:w-80">
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search ID, customer, city, or phone..."
+              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-xs transition-all"
+            />
+          </div>
         </div>
       </div>
 
@@ -147,7 +198,14 @@ export function OrderList({ initialOrders }: OrderListProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
-              {filteredOrders.length === 0 ? (
+              {isLoading && orders.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-slate-400">
+                    <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-emerald-600" />
+                    Loading orders from database...
+                  </td>
+                </tr>
+              ) : filteredOrders.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-slate-400">
                     <ShoppingBag className="w-8 h-8 mx-auto mb-2 text-slate-300" />
@@ -158,15 +216,16 @@ export function OrderList({ initialOrders }: OrderListProps) {
                 filteredOrders.map((order) => {
                   const itemCount = order.items?.length || 0;
                   const firstItem = order.items?.[0];
+                  const orderKey = order.id || (order as any)._id;
 
                   return (
                     <tr
-                      key={order.id}
+                      key={orderKey}
                       className="hover:bg-slate-50/80 transition-colors"
                     >
                       <td className="py-4 px-6">
                         <span className="font-mono font-bold text-xs text-slate-900 block">
-                          #{order.id}
+                          #{orderKey}
                         </span>
                         <span className="text-xs text-slate-400">
                           {formatDateTime(order.createdAt)}

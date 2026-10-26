@@ -112,7 +112,7 @@ export default async function DashboardPage() {
           </div>
           <div className="mt-4">
             <div className="text-2xl font-extrabold text-slate-900">
-              {orders.length}
+              {ordersRes.pagination?.totalCount ?? orders.length}
             </div>
             <p className="text-xs text-blue-600 font-medium mt-1">
               {pendingFulfillmentCount} pending dispatch
