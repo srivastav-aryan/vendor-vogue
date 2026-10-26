@@ -57,6 +57,8 @@ export interface OrderDto {
   paymentProvider?: string;
   paymentTransactionId?: string;
   reservationExpiresAt: string;
+  invoiceNumber?: string;
+  invoiceGeneratedAt?: string;
   paidAt?: string;
   cancelledAt?: string;
   cancellationReason?: string;

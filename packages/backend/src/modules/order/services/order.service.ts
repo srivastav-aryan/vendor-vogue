@@ -267,6 +267,23 @@ export class OrderService implements IOrderService {
         order.paymentProvider = "COD";
         order.paymentStatus = "PENDING";
         order.status = ORDER_STATUS.PROCESSING;
+        order.invoiceNumber = `INV-${new Date().getFullYear()}-${order._id.toString().slice(-6).toUpperCase()}`;
+        order.invoiceGeneratedAt = new Date();
+
+        // Commit physical stock sale immediately for confirmed COD orders
+        for (const item of order.items) {
+          await this.inventoryService.commitSale(
+            {
+              variantId: item.variantId.toString(),
+              quantity: item.quantity,
+              userId: order.userId.toString(),
+              orderId: order._id.toString(),
+            },
+            ctx,
+            session,
+          );
+        }
+
         await order.save({ session });
       } else if (this.paymentGateway) {
         try {
@@ -483,6 +500,8 @@ export class OrderService implements IOrderService {
             paymentProvider,
             paymentTransactionId,
             paidAt: new Date(),
+            invoiceNumber: `INV-${new Date().getFullYear()}-${orderId.slice(-6).toUpperCase()}`,
+            invoiceGeneratedAt: new Date(),
           },
         },
         { new: true, session },
@@ -666,6 +685,24 @@ export class OrderService implements IOrderService {
       );
 
       return { handled: true, orderId: order._id.toString() };
+    }
+
+    // Handle payment failure events
+    if (event.event === "payment.failed") {
+      const paymentEntity = event.payload?.payment?.entity;
+      const gatewayOrderId = paymentEntity?.order_id;
+      if (gatewayOrderId) {
+        const order = await Order.findOne({ gatewayOrderId });
+        if (order && order.status === ORDER_STATUS.PENDING_PAYMENT) {
+          order.paymentStatus = "FAILED";
+          await order.save();
+          ctx?.logger?.info(
+            { orderId: order._id, errorDesc: paymentEntity?.error_description },
+            "Recorded payment failure on pending order from webhook",
+          );
+          return { handled: true, orderId: order._id.toString() };
+        }
+      }
     }
 
     return { handled: false };

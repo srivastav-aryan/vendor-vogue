@@ -18,6 +18,8 @@ export const createOrderRouter = (
 
   // 1. Webhook endpoint (unauthenticated for users; authenticated cryptographically via Razorpay HMAC signature)
   router.post("/webhook/razorpay", orderController.handleRazorpayWebhook);
+  router.post("/webhook", orderController.handleRazorpayWebhook);
+  router.post("/payment/webhook", orderController.handleRazorpayWebhook);
 
   // 2. All user operations require authentication
   router.use(authenticateMiddleware);

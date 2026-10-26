@@ -78,6 +78,8 @@ export interface IOrder extends Document {
   gatewayOrderId?: string;
   paymentTransactionId?: string;
   reservationExpiresAt: Date;
+  invoiceNumber?: string;
+  invoiceGeneratedAt?: Date;
   paidAt?: Date;
   cancelledAt?: Date;
   cancellationReason?: string;
@@ -285,6 +287,15 @@ export const OrderSchema = new Schema<IOrder>(
       type: Date,
       required: true,
     },
+    invoiceNumber: {
+      type: String,
+      trim: true,
+      sparse: true,
+      index: true,
+    },
+    invoiceGeneratedAt: {
+      type: Date,
+    },
     paidAt: {
       type: Date,
     },
@@ -296,7 +307,11 @@ export const OrderSchema = new Schema<IOrder>(
       trim: true,
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
 
 OrderSchema.index({ userId: 1, createdAt: -1 });

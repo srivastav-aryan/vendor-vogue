@@ -15,6 +15,7 @@ import {
   cartRouter,
   categoryRouter,
   orderRouter,
+  orderController,
   productRouter,
   uploadRouter,
   variantRouter,
@@ -139,6 +140,8 @@ export const createApp = (): express.Application => {
   // Cart & Order endpoints
   app.use("/api/cart", cartRouter);
   app.use("/api/orders", orderRouter);
+  // Razorpay payment webhook endpoint (alias for direct gateway webhook configurations)
+  app.post("/api/payment/webhook", orderController.handleRazorpayWebhook);
 
   // Upload signing endpoint (direct-to-cloud upload)
   app.use("/api/upload", uploadRouter);
