@@ -33,9 +33,10 @@ export const globalErrorHandler = (
     message = err.message;
     code = (err as any).code;
   } else if (err instanceof ZodError) {
-    //for zodError
+    // Clean formatted validation message instead of raw JSON regex dumps
     statusCode = 400;
-    message = err.message;
+    message = err.issues.map((issue) => issue.message).join(". ");
+    code = "VALIDATION_ERROR";
 
     errors = err.issues.map((error) => ({
       path: error.path,

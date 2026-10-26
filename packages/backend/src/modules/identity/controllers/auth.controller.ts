@@ -75,7 +75,7 @@ export const authControllerCreator = (
 
         res.cookie("refreshToken", refreshToken, {
           ...cookieOptions,
-          path: "/api/auth/refresh",
+          path: "/api/auth",
           maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
@@ -142,8 +142,7 @@ export const authControllerCreator = (
 
         res.cookie("refreshToken", refreshToken, {
           ...cookieOptions,
-
-          path: "/api/auth/refresh",
+          path: "/api/auth",
           maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
@@ -193,7 +192,7 @@ export const authControllerCreator = (
 
         res.cookie("refreshToken", refreshToken, {
           ...cookieOptions,
-          path: "/api/auth/refresh",
+          path: "/api/auth",
           maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
@@ -215,17 +214,32 @@ export const authControllerCreator = (
     logOut: async (req: Request, res: Response, next: NextFunction) => {
       const ctx = createCtx(req, "log out one device routee");
       try {
-        const refreshToken = tokenService.extractRefreshToken(
-          req.cookies,
-          req.body,
-          ctx,
-        );
+        const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
 
-        await authServices.deleteOneSession(refreshToken);
+        if (refreshToken) {
+          try {
+            await authServices.deleteOneSession(refreshToken);
+          } catch (sessionErr) {
+            ctx.logger?.warn({ err: sessionErr }, "Failed deleting session during logout");
+          }
+        }
 
+        // Clear cookie across all known previous and current path variants
+        res.clearCookie("refreshToken", {
+          ...cookieOptions,
+          path: "/api/auth",
+        });
+        res.clearCookie("refreshToken", {
+          ...cookieOptions,
+          path: "/api/auth/refresh",
+        });
         res.clearCookie("refreshToken", {
           ...cookieOptions,
           path: "/auth/refresh",
+        });
+        res.clearCookie("refreshToken", {
+          ...cookieOptions,
+          path: "/",
         });
 
         res.status(200).json({

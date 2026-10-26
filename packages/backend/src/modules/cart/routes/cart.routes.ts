@@ -29,6 +29,7 @@ export const createCartRouter = (
     validateReq(cartVariantParamSchema),
     cartController.removeItem,
   );
+  router.delete("/", cartController.clearCart);
 
   return router;
 };

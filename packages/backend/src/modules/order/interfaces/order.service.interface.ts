@@ -10,6 +10,8 @@ export interface CreateCheckoutOrderInput {
   shippingAddress: IShippingAddressSnapshot;
   couponCode?: string;
   shippingFee?: number;
+  paymentMethod?: "COD" | "RAZORPAY";
+  items?: Array<{ variantId: string; quantity: number }>;
 }
 
 export interface MarkOrderPaidInput {

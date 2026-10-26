@@ -26,7 +26,7 @@ export const orderControllerCreator = (
           throw new ApiError(401, "Authentication required to checkout");
         }
 
-        const { shippingAddress, couponCode, shippingFee } = req.body;
+        const { shippingAddress, couponCode, shippingFee, paymentMethod, items } = req.body;
 
         const order = await orderService.createCheckoutOrder(
           {
@@ -34,6 +34,8 @@ export const orderControllerCreator = (
             shippingAddress,
             couponCode,
             shippingFee: shippingFee ? Number(shippingFee) : 0,
+            paymentMethod: paymentMethod === "COD" ? "COD" : "RAZORPAY",
+            items: Array.isArray(items) ? items : undefined,
           },
           getContext(req),
         );

@@ -53,7 +53,13 @@ export class OrderService implements IOrderService {
     input: CreateCheckoutOrderInput,
     ctx?: RequestContext,
   ): Promise<IOrder> {
-    const { userId, shippingAddress, couponCode, shippingFee = 0 } = input;
+    const {
+      userId,
+      shippingAddress,
+      couponCode,
+      shippingFee = 0,
+      paymentMethod = "RAZORPAY",
+    } = input;
 
     ctx?.logger?.info(
       { userId, couponCode, shippingFee },
@@ -79,9 +85,37 @@ export class OrderService implements IOrderService {
     }
 
     // 1. Fetch and validate cart
-    const cart = await Cart.findOne({
+    let cart = await Cart.findOne({
       userId: new mongoose.Types.ObjectId(userId),
     });
+
+    // Auto-populate cart if DB cart is empty but client passed valid checkout items
+    if (
+      (!cart || !cart.items || cart.items.length === 0) &&
+      input.items &&
+      input.items.length > 0
+    ) {
+      ctx?.logger?.info(
+        { userId, itemCount: input.items.length },
+        "Auto-populating backend cart from checkout direct items",
+      );
+      if (!cart) {
+        cart = await Cart.create({
+          userId: new mongoose.Types.ObjectId(userId),
+          items: [],
+        });
+      }
+      for (const it of input.items) {
+        if (/^[0-9a-fA-F]{24}$/.test(it.variantId)) {
+          cart.items.push({
+            productVariant: new mongoose.Types.ObjectId(it.variantId),
+            quantity: Math.max(1, Number(it.quantity) || 1),
+            addedAt: new Date(),
+          } as any);
+        }
+      }
+      await cart.save();
+    }
 
     if (!cart || !cart.items || cart.items.length === 0) {
       throw new OrderError(
@@ -228,8 +262,13 @@ export class OrderService implements IOrderService {
         { session },
       );
 
-      // If a payment gateway is configured, register the gateway intent
-      if (this.paymentGateway) {
+      // Branch gateway interaction based on selected payment method
+      if (paymentMethod === "COD") {
+        order.paymentProvider = "COD";
+        order.paymentStatus = "PENDING";
+        order.status = ORDER_STATUS.PROCESSING;
+        await order.save({ session });
+      } else if (this.paymentGateway) {
         try {
           const gatewayOrder = await this.paymentGateway.createPaymentOrder({
             orderId: order._id.toString(),

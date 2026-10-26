@@ -156,5 +156,29 @@ export const cartControllerCreator = (
         next(error);
       }
     },
+
+    async clearCart(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> {
+      try {
+        if (!req.user?._id) {
+          throw new ApiError(401, "Authentication required to update cart");
+        }
+
+        await cartService.clearCart(
+          req.user._id.toString(),
+          getContext(req),
+        );
+
+        res.status(200).json({
+          success: true,
+          message: "Cart cleared successfully",
+        });
+      } catch (error) {
+        next(error);
+      }
+    },
   };
 };
