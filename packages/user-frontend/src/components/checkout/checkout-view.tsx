@@ -71,8 +71,10 @@ export function CheckoutView() {
     if (!isAuthenticated) return;
 
     let isMounted = true;
-    async function fetchLiveSummary() {
+    async function initCheckoutCart() {
       try {
+        // Guarantee local cart is synchronized to backend database
+        await useCartStore.getState().syncCartWithBackend();
         const summary = await getBackendCart(activeCoupon || undefined);
         if (isMounted && summary) {
           setBackendCartSummary(summary);
@@ -82,7 +84,7 @@ export function CheckoutView() {
       }
     }
 
-    fetchLiveSummary();
+    initCheckoutCart();
     return () => {
       isMounted = false;
     };
@@ -397,7 +399,7 @@ export function CheckoutView() {
       {/* Dynamic Razorpay Checkout SDK Script */}
       <Script
         src="https://checkout.razorpay.com/v1/checkout.js"
-        strategy="lazyOnload"
+        strategy="afterInteractive"
       />
 
       <div className="min-h-screen bg-[#fafafa] text-neutral-900 pb-24 font-sans selection:bg-neutral-900 selection:text-white">
