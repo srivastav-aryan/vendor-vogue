@@ -89,6 +89,15 @@ export const createCheckoutOrderSchema = z.object({
       .max(10000, "Shipping fee exceeds maximum permitted amount")
       .optional()
       .default(0),
+    paymentMethod: z.enum(["COD", "RAZORPAY"]).optional().default("RAZORPAY"),
+    items: z
+      .array(
+        z.object({
+          variantId: objectIdAtom,
+          quantity: z.number().int().positive().default(1),
+        })
+      )
+      .optional(),
   }),
 });
 

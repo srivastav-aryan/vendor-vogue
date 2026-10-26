@@ -4,7 +4,10 @@ export const userAddressSchema = z.object({
   id: z.string().optional(),
   _id: z.string().optional(),
   addressType: z.enum(["HOME", "OFFICE", "OTHER"]).default("HOME"),
-  pincode: z.string().min(6, "Pincode must be at least 6 digits"),
+  pincode: z
+    .string()
+    .trim()
+    .regex(/^[1-9][0-9]{5}$/, "PIN code must be exactly 6 digits and cannot start with 0"),
   state: z.string().min(1, "State is required"),
   locality: z.string().min(1, "Locality is required"),
   city: z.string().min(1, "City is required"),
@@ -12,7 +15,13 @@ export const userAddressSchema = z.object({
   addressLine1: z.string().min(1, "Address line 1 is required"),
   addressLine2: z.string().optional().default(""),
   landmark: z.string().optional().default(""),
-  phone: z.string().min(10, "Phone must be at least 10 digits"),
+  phone: z
+    .string()
+    .trim()
+    .regex(
+      /^(?:(?:\+|0{0,2})91(\s*[- ]\s*)?)?[6789]\d{9}$/,
+      "Phone must be a valid 10-digit Indian phone number (optionally with +91)"
+    ),
   name: z.string().min(1, "Name is required"),
   isDefault: z.boolean().optional().default(false),
 });
