@@ -17,14 +17,20 @@ export const EDITORIAL_QUICK_LINKS: EditorialMenuLink[] = [
 ];
 
 /**
- * Default Storefront Navigation tree matching the seeded backend database hierarchy:
- * Roots: Men, Women, Kids
+ * Default Storefront Navigation tree:
+ * - "Shop": Direct link to /catalog without mega menu
+ * - "Men", "Women", "Kids": Root categories that open mega menus without navigating away
  */
 export const DEFAULT_NAV_ITEMS: NavigationItem[] = [
   {
+    id: "nav-shop",
+    label: "Shop",
+    href: "/catalog",
+  },
+  {
     id: "nav-men",
     label: "Men",
-    href: "/catalog/men",
+    href: "#",
     hasMenu: [
       {
         name: "Topwear",
@@ -52,7 +58,7 @@ export const DEFAULT_NAV_ITEMS: NavigationItem[] = [
   {
     id: "nav-women",
     label: "Women",
-    href: "/catalog/women",
+    href: "#",
     hasMenu: [
       {
         name: "Topwear",
@@ -79,7 +85,7 @@ export const DEFAULT_NAV_ITEMS: NavigationItem[] = [
   {
     id: "nav-kids",
     label: "Kids",
-    href: "/catalog/kids",
+    href: "#",
     hasMenu: [
       {
         name: "Boys",

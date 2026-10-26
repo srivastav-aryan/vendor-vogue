@@ -12,6 +12,8 @@ export interface StorefrontCategoriesResponse {
 /**
  * Transforms flat category list with parent/child relationships from
  * GET /api/catalog/categories/storefront into hierarchical NavigationItem[] for the Mega Menu.
+ * Prepend a direct "Shop" link (no mega menu), while root categories (Men, Women, Kids)
+ * act strictly as mega-menu triggers without navigating away.
  */
 export function transformCategoriesToNavItems(
   categories: CategoryResponse[]
@@ -45,10 +47,10 @@ export function transformCategoriesToNavItems(
   }
 
   // Build Navigation Items from Root Categories (e.g., Men, Women)
-  const navItems: NavigationItem[] = rootCategories.map((root) => {
+  const categoryNavItems: NavigationItem[] = rootCategories.map((root) => {
     const level1Children = childrenMap.get(root.id) || [];
 
-    // Each level 1 child becomes a MegamenuSection (e.g. "Topwear", "Bottomwear", "Western Wear")
+    // Each level 1 child becomes a MegamenuSection (e.g. "Topwear", "Bottomwear")
     const sections: MegamenuSection[] = level1Children.map((level1) => {
       const level2Children = childrenMap.get(level1.id) || [];
 
@@ -80,12 +82,20 @@ export function transformCategoriesToNavItems(
     return {
       id: `nav-${root.slug}`,
       label: root.name,
-      href: `/catalog/${root.slug}`,
+      href: "#", // Root categories open mega menus; clicking doesn't navigate away
       hasMenu: sections.length > 0 ? sections : undefined,
     };
   });
 
-  return navItems;
+  // Prepend direct "Shop" link
+  return [
+    {
+      id: "nav-shop",
+      label: "Shop",
+      href: "/catalog",
+    },
+    ...categoryNavItems,
+  ];
 }
 
 /**
