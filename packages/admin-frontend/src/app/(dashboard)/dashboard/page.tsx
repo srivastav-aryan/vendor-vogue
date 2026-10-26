@@ -19,11 +19,13 @@ export const revalidate = 0; // Fresh real-time data for operations dashboard
 export default async function DashboardPage() {
   // Fetch platform metrics in parallel with Zero Waterfalls
   const [brandsRes, categoriesRes, productsRes, ordersRes] = await Promise.all([
-    serverApiFetch<any[]>("/api/catalog/brands", { params: { limit: 100 } }).catch(() => ({ data: [] })),
-    serverApiFetch<any[]>("/api/catalog/categories", { params: { limit: 100 } }).catch(() => ({ data: [] })),
-    serverApiFetch<any[]>("/api/catalog/products", { params: { limit: 100 } }).catch(() => ({ data: [] })),
+    serverApiFetch<any[]>("/api/catalog/brands", { params: { limit: 100 } }).catch(() => ({ success: false, data: [] })),
+    serverApiFetch<any[]>("/api/catalog/categories", { params: { limit: 100 } }).catch(() => ({ success: false, data: [] })),
+    serverApiFetch<any[]>("/api/catalog/products", { params: { limit: 100 } }).catch(() => ({ success: false, data: [] })),
     serverApiFetch<any>("/api/orders", { params: { limit: 50 } }).catch(() => ({
-      data: { orders: [], total: 0 },
+      success: false,
+      data: [],
+      pagination: undefined,
     })),
   ]);
 
@@ -112,7 +114,7 @@ export default async function DashboardPage() {
           </div>
           <div className="mt-4">
             <div className="text-2xl font-extrabold text-slate-900">
-              {ordersRes.pagination?.totalCount ?? orders.length}
+              {(ordersRes as any).pagination?.totalCount ?? (ordersRes as any).pagination?.total ?? orders.length}
             </div>
             <p className="text-xs text-blue-600 font-medium mt-1">
               {pendingFulfillmentCount} pending dispatch
