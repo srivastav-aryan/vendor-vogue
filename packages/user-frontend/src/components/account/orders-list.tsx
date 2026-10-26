@@ -139,11 +139,11 @@ export function OrdersList() {
                     <Button
                       asChild
                       variant="outline"
-                      className="rounded-none text-xs font-mono uppercase tracking-wider h-9 px-3.5 border-neutral-300"
+                      className="rounded-none text-xs font-mono uppercase tracking-wider h-9 px-3.5 border-neutral-300 hover:bg-neutral-100"
                     >
-                      <Link href={`/order-success/${orderIdStr}`}>
-                        <span>RECEIPT</span>
-                        <ExternalLink className="w-3 h-3 ml-1.5" />
+                      <Link href={`/account/orders/${orderIdStr}`}>
+                        <span>DETAILS & INVOICE</span>
+                        <ArrowRight className="w-3 h-3 ml-1.5" />
                       </Link>
                     </Button>
                   </div>

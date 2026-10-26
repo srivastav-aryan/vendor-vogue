@@ -40,35 +40,7 @@ export default function OrderSuccessPage() {
           if (data) {
             setOrder(data);
           } else {
-            // If backend returned null or sandbox test order was created
-            setOrder({
-              id: orderId,
-              userId: "",
-              status: "PAID",
-              items: [],
-              shippingAddress: {
-                name: "Valued Client",
-                phone: "+91 98765 43210",
-                addressLine1: "Client Registered Address",
-                locality: "Central District",
-                city: "Mumbai",
-                state: "Maharashtra",
-                pincode: "400001",
-                country: "India",
-              },
-              cartSubtotal: 1999,
-              totalDiscount: 0,
-              totalTaxableAmount: 1785,
-              totalGst: 214,
-              shippingFee: 0,
-              finalPayableAmount: 1999,
-              appliedRuleCodes: [],
-              paymentStatus: "COMPLETED",
-              paymentProvider: "RAZORPAY",
-              reservationExpiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            });
+            setError("Order record could not be retrieved from the server. Please check your orders archive.");
           }
         }
       } catch (err: any) {

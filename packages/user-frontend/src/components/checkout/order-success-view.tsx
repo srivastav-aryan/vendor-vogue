@@ -285,8 +285,8 @@ export function OrderSuccessView({ order }: OrderSuccessViewProps) {
             asChild
             className="w-full sm:w-auto h-12 px-8 rounded-none bg-black text-white hover:bg-neutral-800 text-xs font-bold uppercase tracking-[0.2em] shadow-sm"
           >
-            <Link href="/account/orders">
-              <span>VIEW IN ORDER ARCHIVE</span>
+            <Link href={`/account/orders/${order.id || (order as any)._id}`}>
+              <span>VIEW ORDER & TAX INVOICE</span>
               <ArrowRight className="w-3.5 h-3.5 ml-2" />
             </Link>
           </Button>
