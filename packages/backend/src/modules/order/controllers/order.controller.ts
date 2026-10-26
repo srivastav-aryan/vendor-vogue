@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { USER_ROLES } from "@e-com/shared/authorization";
 import { IOrderService } from "../interfaces/order.service.interface.js";
 import { IOrderController } from "../interfaces/order.controller.interface.js";
 import { RequestContext } from "../../../shared/types/request-context.js";
@@ -60,7 +61,9 @@ export const orderControllerCreator = (
         }
 
         const { orderId } = req.params;
-        const isAdmin = req.user.role === "ADMIN";
+        const isAdmin =
+          req.user.role === USER_ROLES.ADMIN ||
+          req.user.role === USER_ROLES.SUPER_ADMIN;
 
         const order = await orderService.getOrderById(
           orderId,
@@ -87,7 +90,9 @@ export const orderControllerCreator = (
           throw new ApiError(401, "Authentication required");
         }
 
-        const isAdmin = req.user.role === "ADMIN";
+        const isAdmin =
+          req.user.role === USER_ROLES.ADMIN ||
+          req.user.role === USER_ROLES.SUPER_ADMIN;
         const queryParams = req.query as any;
 
         const targetUserId = isAdmin
@@ -126,7 +131,9 @@ export const orderControllerCreator = (
 
         const { orderId } = req.params;
         const { reason = "Customer requested cancellation" } = req.body;
-        const isAdmin = req.user.role === "ADMIN";
+        const isAdmin =
+          req.user.role === USER_ROLES.ADMIN ||
+          req.user.role === USER_ROLES.SUPER_ADMIN;
 
         const order = await orderService.cancelOrder(
           {
