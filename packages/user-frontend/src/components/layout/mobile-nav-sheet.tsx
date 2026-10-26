@@ -18,7 +18,9 @@ import {
 } from "@/components/ui/accordion";
 import type { NavigationItem } from "@e-com/shared/types";
 import { EDITORIAL_QUICK_LINKS } from "@/lib/constants/navigation";
-import { Search, X } from "lucide-react";
+import { Search, X, User, LogOut, ChevronRight } from "lucide-react";
+import { useAuthStore } from "@/lib/store/auth-store";
+import { useHydratedStore } from "@/lib/store/use-store";
 
 interface MobileNavSheetProps {
   open: boolean;
@@ -33,6 +35,20 @@ export function MobileNavSheet({
 }: MobileNavSheetProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = React.useState("");
+  const isHydrated = useHydratedStore(useAuthStore, () => true) ?? false;
+  const { user, isAuthenticated, logout } = useAuthStore();
+  const [isLoggingOut, setIsLoggingOut] = React.useState(false);
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await logout();
+      onOpenChange(false);
+      router.push("/");
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,16 +114,29 @@ export function MobileNavSheet({
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
           {/* Primary Quick Department Links (Dynamic from backend navItems) */}
           <div className="flex items-center gap-6 pb-4 border-b border-white/[0.08]">
-            {navItems.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                onClick={() => onOpenChange(false)}
-                className="text-xs font-semibold uppercase tracking-[0.25em] text-white/90 hover:text-white"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const hasMenu = Boolean(item.hasMenu && item.hasMenu.length > 0);
+              if (hasMenu) {
+                return (
+                  <span
+                    key={item.id}
+                    className="text-xs font-semibold uppercase tracking-[0.25em] text-white/40 select-none cursor-default"
+                  >
+                    {item.label}
+                  </span>
+                );
+              }
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  onClick={() => onOpenChange(false)}
+                  className="text-xs font-semibold uppercase tracking-[0.25em] text-white/90 hover:text-white"
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </div>
 
           {/* Section 1: Editorial Highlights */}
@@ -172,6 +201,73 @@ export function MobileNavSheet({
               )}
             </Accordion>
           </div>
+        </div>
+
+        {/* User Account / Auth Section */}
+        <div className="p-6 border-t border-white/[0.08] bg-white/[0.02]">
+          {!isHydrated ? (
+            <div className="h-10 w-full bg-white/[0.03] animate-pulse rounded-none" />
+          ) : isAuthenticated ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white font-mono text-xs font-bold">
+                  {user?.firstname?.[0]?.toUpperCase() || "U"}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold uppercase tracking-wider text-white truncate">
+                    {user?.firstname} {user?.lastname}
+                  </p>
+                  <p className="text-[10px] text-white/50 font-mono truncate">{user?.email}</p>
+                </div>
+              </div>
+
+              <div className="space-y-2 text-xs uppercase tracking-[0.2em] pt-2">
+                <Link
+                  href="/account"
+                  onClick={() => onOpenChange(false)}
+                  className="flex items-center justify-between text-white/70 hover:text-white py-1.5 transition-colors"
+                >
+                  <span>PROFILE & ACCOUNT</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-white/40" />
+                </Link>
+                <Link
+                  href="/account/addresses"
+                  onClick={() => onOpenChange(false)}
+                  className="flex items-center justify-between text-white/70 hover:text-white py-1.5 transition-colors"
+                >
+                  <span>SAVED ADDRESSES</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-white/40" />
+                </Link>
+                <Link
+                  href="/account/orders"
+                  onClick={() => onOpenChange(false)}
+                  className="flex items-center justify-between text-white/70 hover:text-white py-1.5 transition-colors"
+                >
+                  <span>MY ORDERS</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-white/40" />
+                </Link>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 px-4 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-mono uppercase tracking-[0.2em] transition-colors disabled:opacity-50 cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5 text-rose-400" />
+                <span>{isLoggingOut ? "SIGNING OUT..." : "LOG OUT"}</span>
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              onClick={() => onOpenChange(false)}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-white text-black hover:bg-neutral-200 text-xs font-bold uppercase tracking-[0.25em] transition-colors"
+            >
+              <User className="w-4 h-4" />
+              <span>LOG IN / REGISTER</span>
+            </Link>
+          )}
         </div>
 
         {/* Drawer Footer */}

@@ -3,6 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Plus, Minus, Trash2, ArrowRight, ShoppingBag } from "lucide-react";
 import {
   Sheet,
@@ -16,6 +17,7 @@ import { useHydratedStore } from "@/lib/store/use-store";
 import cloudinaryLoader from "@/lib/cloudinary-loader";
 
 export function CartDrawer() {
+  const router = useRouter();
   const isDrawerOpen = useCartStore((s) => s.isDrawerOpen);
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
   const removeItem = useCartStore((s) => s.removeItem);
@@ -165,7 +167,11 @@ export function CartDrawer() {
 
               <Button
                 type="button"
-                className="w-full h-12 bg-black hover:bg-neutral-900 text-white text-xs sm:text-sm font-bold uppercase tracking-[0.2em] rounded-none shadow-md flex items-center justify-center gap-2 group transition-all"
+                onClick={() => {
+                  setDrawerOpen(false);
+                  router.push("/checkout");
+                }}
+                className="w-full h-12 bg-black hover:bg-neutral-900 text-white text-xs sm:text-sm font-bold uppercase tracking-[0.2em] rounded-none shadow-md flex items-center justify-center gap-2 group transition-all cursor-pointer"
               >
                 <span>Checkout</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />

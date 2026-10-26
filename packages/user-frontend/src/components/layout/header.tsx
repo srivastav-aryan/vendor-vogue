@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Menu, X, Search as SearchIcon } from "lucide-react";
+import { Menu, X, Search as SearchIcon, User as UserIcon, LogOut, ChevronDown, Loader2, MapPin, Package, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { NavigationItem } from "@e-com/shared/types";
 import { DEFAULT_NAV_ITEMS } from "@/lib/constants/navigation";
@@ -11,6 +11,7 @@ import { MegaMenu } from "./mega-menu";
 import { MobileNavSheet } from "./mobile-nav-sheet";
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { useCartStore } from "@/lib/store/cart-store";
+import { useAuthStore } from "@/lib/store/auth-store";
 import { useHydratedStore } from "@/lib/store/use-store";
 
 interface HeaderProps {
@@ -28,6 +29,12 @@ export function Header({
   const [searchOverlayOpen, setSearchOverlayOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
 
+  const isHydrated = useHydratedStore(useAuthStore, () => true) ?? false;
+  const { user, isAuthenticated, logout } = useAuthStore();
+  const [accountMenuOpen, setAccountMenuOpen] = React.useState(false);
+  const [isLoggingOut, setIsLoggingOut] = React.useState(false);
+  const accountMenuRef = React.useRef<HTMLDivElement | null>(null);
+
   const setCartDrawerOpen = useCartStore((s) => s.setDrawerOpen);
   const totalCartCount = useHydratedStore(useCartStore, (s) =>
     s.items.reduce((acc, i) => acc + i.quantity, 0)
@@ -37,8 +44,30 @@ export function Header({
   const openTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const closeTimerRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  // Header turns white when user scrolls past hero OR when megamenu/search is open
-  const isWhiteMode = isScrolled || activeMenuId !== null || searchOverlayOpen;
+  // Close account menu on click outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) {
+        setAccountMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await logout();
+      setAccountMenuOpen(false);
+      router.push("/");
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  // Header turns white when user scrolls past hero OR when megamenu/search/account is open
+  const isWhiteMode = isScrolled || activeMenuId !== null || searchOverlayOpen || accountMenuOpen;
 
   const clearTimers = () => {
     if (openTimerRef.current) {
@@ -156,26 +185,59 @@ export function Header({
                     onMouseEnter={() => handleNavMouseEnter(item.id, hasMenu)}
                     onMouseLeave={handleNavMouseLeave}
                   >
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "transition-colors duration-200 relative py-1",
-                        isWhiteMode
-                          ? "text-neutral-700 hover:text-black"
-                          : "text-white/90 hover:text-white drop-shadow-sm",
-                        isActive && (isWhiteMode ? "text-black font-bold" : "text-white font-bold")
-                      )}
-                    >
-                      {item.label}
-                      {isActive && (
-                        <span
-                          className={cn(
-                            "absolute bottom-0 left-0 w-full h-[1.5px] transition-all",
-                            isWhiteMode ? "bg-black" : "bg-white"
-                          )}
-                        />
-                      )}
-                    </Link>
+                    {hasMenu ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          clearTimers();
+                          setActiveMenuId(activeMenuId === item.id ? null : item.id);
+                        }}
+                        className={cn(
+                          "transition-colors duration-200 relative py-1 cursor-pointer bg-transparent border-none text-xs uppercase tracking-[0.22em] font-medium p-0 select-none",
+                          isWhiteMode
+                            ? "text-neutral-700 hover:text-black"
+                            : "text-white/90 hover:text-white drop-shadow-sm",
+                          isActive && (isWhiteMode ? "text-black font-bold" : "text-white font-bold")
+                        )}
+                        aria-expanded={isActive}
+                      >
+                        {item.label}
+                        {isActive && (
+                          <span
+                            className={cn(
+                              "absolute bottom-0 left-0 w-full h-[1.5px] transition-all",
+                              isWhiteMode ? "bg-black" : "bg-white"
+                            )}
+                          />
+                        )}
+                      </button>
+                    ) : (
+                      <Link
+                        href={item.href}
+                        onClick={() => {
+                          clearTimers();
+                          setActiveMenuId(null);
+                        }}
+                        className={cn(
+                          "transition-colors duration-200 relative py-1",
+                          isWhiteMode
+                            ? "text-neutral-700 hover:text-black"
+                            : "text-white/90 hover:text-white drop-shadow-sm",
+                          isActive && (isWhiteMode ? "text-black font-bold" : "text-white font-bold")
+                        )}
+                      >
+                        {item.label}
+                        {isActive && (
+                          <span
+                            className={cn(
+                              "absolute bottom-0 left-0 w-full h-[1.5px] transition-all",
+                              isWhiteMode ? "bg-black" : "bg-white"
+                            )}
+                          />
+                        )}
+                      </Link>
+                    )}
                   </div>
                 );
               })}
@@ -196,6 +258,119 @@ export function Header({
             >
               SEARCH
             </button>
+
+            {/* ACCOUNT / LOG IN */}
+            {!isHydrated ? (
+              <div className="hidden md:inline-block w-16 h-4 bg-transparent" />
+            ) : isAuthenticated ? (
+              <div className="relative" ref={accountMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setAccountMenuOpen((prev) => !prev)}
+                  className={cn(
+                    "hidden md:inline-flex items-center gap-1.5 tracking-[0.22em] transition-colors cursor-pointer py-1 font-medium select-none",
+                    isWhiteMode ? "text-neutral-800 hover:text-black" : "text-white/90 hover:text-white drop-shadow-sm"
+                  )}
+                  aria-expanded={accountMenuOpen}
+                >
+                  <UserIcon className="w-3.5 h-3.5" />
+                  <span>{user?.firstname ? user.firstname.toUpperCase() : "ACCOUNT"}</span>
+                  <ChevronDown className={cn("w-3 h-3 transition-transform duration-200", accountMenuOpen && "rotate-180")} />
+                </button>
+
+                {accountMenuOpen && (
+                  <div className="absolute right-0 top-full mt-3 w-72 bg-white text-neutral-900 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.15)] border border-neutral-200/90 p-4 animate-in fade-in zoom-in-95 duration-150 z-50">
+                    {/* User Identity Header */}
+                    <div className="pb-3.5 mb-2 border-b border-neutral-100">
+                      <div className="flex items-center justify-between mb-2.5">
+                        <span className="text-[9px] font-mono uppercase tracking-[0.25em] text-neutral-400">
+                          CLIENT ARCHIVE
+                        </span>
+                        <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 bg-neutral-100 text-neutral-700 tracking-wider font-semibold">
+                          MEMBER
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-black text-white flex items-center justify-center font-mono text-[11px] font-bold shrink-0 tracking-wider">
+                          {((user?.firstname?.[0] || "") + (user?.lastname?.[0] || "")).toUpperCase() || "VV"}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-black truncate leading-tight">
+                            {user?.firstname} {user?.lastname}
+                          </p>
+                          <p className="text-[11px] text-neutral-400 font-mono truncate mt-0.5">
+                            {user?.email}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Navigation Items */}
+                    <div className="py-1 space-y-0.5 text-[11px] uppercase tracking-[0.2em] font-medium">
+                      <Link
+                        href="/account"
+                        onClick={() => setAccountMenuOpen(false)}
+                        className="flex items-center justify-between px-2.5 py-2 text-neutral-600 hover:text-black hover:bg-neutral-50 transition-colors group"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <UserIcon className="w-3.5 h-3.5 text-neutral-400 group-hover:text-black transition-colors" />
+                          <span>PROFILE & ACCOUNT</span>
+                        </div>
+                        <ArrowUpRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-neutral-400 group-hover:text-black" />
+                      </Link>
+                      <Link
+                        href="/account/addresses"
+                        onClick={() => setAccountMenuOpen(false)}
+                        className="flex items-center justify-between px-2.5 py-2 text-neutral-600 hover:text-black hover:bg-neutral-50 transition-colors group"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <MapPin className="w-3.5 h-3.5 text-neutral-400 group-hover:text-black transition-colors" />
+                          <span>SAVED ADDRESSES</span>
+                        </div>
+                        <ArrowUpRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-neutral-400 group-hover:text-black" />
+                      </Link>
+                      <Link
+                        href="/account/orders"
+                        onClick={() => setAccountMenuOpen(false)}
+                        className="flex items-center justify-between px-2.5 py-2 text-neutral-600 hover:text-black hover:bg-neutral-50 transition-colors group"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Package className="w-3.5 h-3.5 text-neutral-400 group-hover:text-black transition-colors" />
+                          <span>MY ORDERS</span>
+                        </div>
+                        <ArrowUpRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-neutral-400 group-hover:text-black" />
+                      </Link>
+                    </div>
+
+                    {/* Sign Out Action */}
+                    <div className="pt-2 mt-2 border-t border-neutral-100">
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        className="w-full px-2.5 py-2 text-[11px] uppercase tracking-[0.2em] font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50/70 transition-colors disabled:opacity-50 cursor-pointer flex items-center justify-between group"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <LogOut className="w-3.5 h-3.5 text-rose-500 group-hover:text-rose-700 group-hover:-translate-x-0.5 transition-all" />
+                          <span>{isLoggingOut ? "SIGNING OUT..." : "LOG OUT"}</span>
+                        </div>
+                        {isLoggingOut && <Loader2 className="w-3 h-3 animate-spin text-rose-600" />}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className={cn(
+                  "hidden md:inline-flex items-center gap-1.5 tracking-[0.22em] transition-colors cursor-pointer py-1",
+                  isWhiteMode ? "text-neutral-700 hover:text-black" : "text-white/90 hover:text-white drop-shadow-sm"
+                )}
+              >
+                <span>LOG IN</span>
+              </Link>
+            )}
 
             {/* BAG Button: Opens Cart Drawer directly */}
             <button
