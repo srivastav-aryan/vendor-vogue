@@ -13,6 +13,7 @@
     "dev:shared": "pnpm --filter shared dev",
     "seed:admin": "pnpm --filter backend seed:admin",
     "seed:catalog": "pnpm --filter backend seed:catalog",
+    "seed:all": "pnpm seed:admin && pnpm seed:catalog",
     "test": "pnpm --filter backend test",
     "test:unit": "pnpm --filter backend test:unit",
     "test:integration": "pnpm --filter backend test:integration",

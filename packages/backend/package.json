@@ -10,7 +10,7 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:watch": "vitest",
-    "start": "dist/server.js",
+    "start": "node dist/server.js",
     "dev:node": "nodemon dist/server.js",
     "dev:ts": "tsc --watch",
     "clean": "rimraf dist",
