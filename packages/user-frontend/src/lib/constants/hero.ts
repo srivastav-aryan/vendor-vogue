@@ -54,11 +54,11 @@ export interface HeroConfig {
 
 export const HERO_CONFIG: HeroConfig = {
   mode: "image",
-  imageSrc: "/images/hero/hero.jpg",
-  imageSrcTablet: "/images/hero/hero-tablet.jpg", // 1200x896 (landscape/4:3 tablet aspect)
-  imageSrcMobile: "/images/hero/hero-mobile.jpg", // 768x1376 (9:16 vertical portrait for mobile)
+  imageSrc: "/images/hero/hero.webp",
+  imageSrcTablet: "/images/hero/hero-tablet.webp", // 1200x896 (landscape/4:3 tablet aspect)
+  imageSrcMobile: "/images/hero/hero-mobile.webp", // 768x1376 (9:16 vertical portrait for mobile)
   videoSrc: "",
-  posterSrc: "/images/hero/hero.jpg",
+  posterSrc: "/images/hero/hero.webp",
   title: "VENDOR\nVOGUE",
   subtitle: "AUTUMN / WINTER 2026",
   ctaText: "DISCOVER FW26 →",

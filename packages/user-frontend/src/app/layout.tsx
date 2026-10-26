@@ -46,6 +46,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={fontSans.variable}>
+      <head>
+        {/* Preload critical LCP Hero image for Mobile & Desktop */}
+        <link
+          rel="preload"
+          as="image"
+          type="image/webp"
+          href="/images/hero/hero-mobile.webp"
+          media="(max-width: 639px)"
+          fetchPriority="high"
+        />
+        <link
+          rel="preload"
+          as="image"
+          type="image/webp"
+          href="/images/hero/hero.webp"
+          media="(min-width: 640px)"
+          fetchPriority="high"
+        />
+      </head>
       <body className="min-h-screen bg-background font-sans antialiased text-foreground flex flex-col justify-between">
         <AuthProvider>
           <div className="flex-1">{children}</div>

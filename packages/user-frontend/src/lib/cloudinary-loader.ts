@@ -19,7 +19,21 @@ export default function cloudinaryLoader({
 }): string {
   if (!src) return "";
 
-  // If external non-Cloudinary image (e.g. unsplash or local /images/...), return as-is
+  // If external Unsplash image, dynamically adjust parameters to serve responsive dimensions
+  if (src.includes("images.unsplash.com")) {
+    try {
+      const url = new URL(src);
+      url.searchParams.set("w", width.toString());
+      url.searchParams.set("q", (quality || 75).toString());
+      url.searchParams.set("auto", "format");
+      url.searchParams.set("fit", "crop");
+      return url.toString();
+    } catch {
+      return src;
+    }
+  }
+
+  // If external non-Cloudinary image (e.g. local /images/...), return as-is
   if (!src.includes("res.cloudinary.com")) {
     return src;
   }

@@ -20,10 +20,22 @@ interface HeaderProps {
 }
 
 export function Header({
-  isScrolled = false,
+  isScrolled,
   navItems = DEFAULT_NAV_ITEMS,
 }: HeaderProps) {
   const router = useRouter();
+  const [internalScrolled, setInternalScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isScrolled !== undefined) return;
+    const handleScroll = () => {
+      const past = window.scrollY > 40;
+      setInternalScrolled((prev) => (prev !== past ? past : prev));
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isScrolled]);
   const [activeMenuId, setActiveMenuId] = React.useState<string | null>(null);
   const [mobileSheetOpen, setMobileSheetOpen] = React.useState(false);
   const [searchOverlayOpen, setSearchOverlayOpen] = React.useState(false);
@@ -67,7 +79,8 @@ export function Header({
   };
 
   // Header turns white when user scrolls past hero OR when megamenu/search/account is open
-  const isWhiteMode = isScrolled || activeMenuId !== null || searchOverlayOpen || accountMenuOpen;
+  const activeScrolled = isScrolled !== undefined ? isScrolled : internalScrolled;
+  const isWhiteMode = activeScrolled || activeMenuId !== null || searchOverlayOpen || accountMenuOpen;
 
   const clearTimers = () => {
     if (openTimerRef.current) {

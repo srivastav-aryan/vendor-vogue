@@ -11,7 +11,7 @@ interface DiscoverCampaignSectionProps {
 }
 
 export function DiscoverCampaignSection({
-  imageSrc = "/images/discover.jpg",
+  imageSrc = "/images/discover.webp",
   brandTitle = "VENDOR VOGUE",
   tagline = "An Eternal Perspective.",
   buttonText = "DISCOVER",
@@ -25,13 +25,13 @@ export function DiscoverCampaignSection({
         className || ""
       }`}
     >
-      {/* Background Campaign Visual using discover.jpg */}
+      {/* Background Campaign Visual using discover.webp */}
       <Image
         src={imageSrc}
         alt={`${brandTitle} - ${tagline}`}
         fill
-        sizes="100vw"
-        quality={90}
+        sizes="(max-width: 768px) 100vw, 100vw"
+        quality={75}
         className="object-cover object-center transform-gpu"
       />
 

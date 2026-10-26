@@ -208,7 +208,7 @@ export function CheckoutView() {
       if (
         !window.Razorpay ||
         razorpayKey === "rzp_test_placeholder" ||
-        !order.gatewayOrderId
+        !(order as any).gatewayOrderId
       ) {
         // Dev / Test simulation mode for frictionless preview without blocker
         console.info(

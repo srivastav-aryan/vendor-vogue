@@ -32,6 +32,7 @@ export function AddressFormDialog({
     phone: "",
     addressLine1: "",
     addressLine2: "",
+    landmark: "",
     locality: "",
     city: "",
     state: "",
@@ -55,6 +56,7 @@ export function AddressFormDialog({
         phone: addressToEdit.phone || "",
         addressLine1: addressToEdit.addressLine1 || "",
         addressLine2: addressToEdit.addressLine2 || "",
+        landmark: addressToEdit.landmark || "",
         locality: addressToEdit.locality || "",
         city: addressToEdit.city || "",
         state: addressToEdit.state || "",
@@ -69,6 +71,7 @@ export function AddressFormDialog({
         phone: "",
         addressLine1: "",
         addressLine2: "",
+        landmark: "",
         locality: "",
         city: "",
         state: "",
@@ -136,6 +139,11 @@ export function AddressFormDialog({
     }
 
     try {
+      if (!validation.success) {
+        setServerError("Invalid address information.");
+        return;
+      }
+
       setIsSubmitting(true);
       await onSave(validation.data);
       onOpenChange(false);

@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import Link from "next/link";
 import { HERO_CONFIG, type HeroConfig } from "@/lib/constants/hero";
@@ -12,33 +10,12 @@ export interface HeroProps {
 
 export function Hero({
   config,
-  onScrollThresholdChange,
   showEditorialOverlay = true,
 }: HeroProps) {
   const mergedConfig: HeroConfig = {
     ...HERO_CONFIG,
     ...config,
   };
-
-  const lastPastRef = React.useRef(false);
-
-  React.useEffect(() => {
-    if (!onScrollThresholdChange) return;
-
-    const handleScroll = () => {
-      // Trigger white header once scrolled past threshold
-      const isPast = window.scrollY > 40;
-      if (lastPastRef.current !== isPast) {
-        lastPastRef.current = isPast;
-        onScrollThresholdChange(isPast);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [onScrollThresholdChange]);
 
   const isVideoMode = mergedConfig.mode === "video" && Boolean(mergedConfig.videoSrc);
 
@@ -59,23 +36,37 @@ export function Hero({
             <source src={mergedConfig.videoSrc} type="video/mp4" />
           </video>
         ) : (
-          /* Native Art-Directed Responsive Picture:
-             Preserves model's face, clothing, jewelry, and background without awkward cropping */
+          /* Native Art-Directed Responsive Picture with WebP and JPEG fallbacks */
           <picture className="w-full h-full">
-            {mergedConfig.imageSrcMobile && (
-              <source
-                media="(max-width: 639px)"
-                srcSet={mergedConfig.imageSrcMobile}
-              />
-            )}
-            {mergedConfig.imageSrcTablet && (
-              <source
-                media="(max-width: 1023px)"
-                srcSet={mergedConfig.imageSrcTablet}
-              />
-            )}
+            {/* Mobile (max-width: 639px) */}
+            <source
+              media="(max-width: 639px)"
+              type="image/webp"
+              srcSet="/images/hero/hero-mobile.webp"
+            />
+            <source
+              media="(max-width: 639px)"
+              srcSet="/images/hero/hero-mobile.jpg"
+            />
+
+            {/* Tablet (max-width: 1023px) */}
+            <source
+              media="(max-width: 1023px)"
+              type="image/webp"
+              srcSet="/images/hero/hero-tablet.webp"
+            />
+            <source
+              media="(max-width: 1023px)"
+              srcSet="/images/hero/hero-tablet.jpg"
+            />
+
+            {/* Desktop Default */}
+            <source
+              type="image/webp"
+              srcSet="/images/hero/hero.webp"
+            />
             <img
-              src={mergedConfig.imageSrc}
+              src={mergedConfig.imageSrc || "/images/hero/hero.webp"}
               alt="Vendor Vogue Autumn/Winter 2026 Campaign"
               loading="eager"
               fetchPriority="high"

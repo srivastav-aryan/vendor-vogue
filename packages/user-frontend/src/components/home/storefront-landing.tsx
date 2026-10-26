@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { Header } from "@/components/layout/header";
 import { Hero } from "@/components/home/hero";
@@ -26,17 +24,15 @@ export function StorefrontLanding({
   initialTrending,
   initialLimited,
 }: StorefrontLandingProps) {
-  const [isScrolled, setIsScrolled] = React.useState(false);
-
   return (
     <div className="relative min-h-screen bg-background text-foreground">
       {/* Dynamic Header (transparent over hero, turns white on scroll) */}
-      <Header isScrolled={isScrolled} navItems={navItems} />
+      <Header navItems={navItems} />
 
       {/* Main Landmark for accessibility & SEO */}
       <main id="main-content">
         {/* Full Viewport Campaign Hero */}
-        <Hero onScrollThresholdChange={setIsScrolled} />
+        <Hero />
 
         {/* Bestseller Product Section directly below Hero */}
         <BestsellerSection initialProducts={initialBestsellers} />
@@ -53,7 +49,7 @@ export function StorefrontLanding({
         {/* Limited Product Section placed between Video and Discover */}
         <LimitedSection initialProducts={initialLimited} />
 
-        {/* Editorial Discover Campaign Section using discover.jpg */}
+        {/* Editorial Discover Campaign Section using discover.webp */}
         <DiscoverCampaignSection />
       </main>
     </div>
