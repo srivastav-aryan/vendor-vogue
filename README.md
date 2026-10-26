@@ -18,7 +18,7 @@
   Features double-entry inventory ledger accounting, multi-document ACID transactions with 15-minute hold TTLs, statutory GST/HSN tax compliance, and a zero-server-CPU Cloudinary edge media pipeline.
 </p>
 
-[Live Demo Placeholder](#-live-demo--preview) • [Architecture Overview](#-system-architecture) • [Engineering Highlights](#-core-engineering-highlights) • [Local Development](#-local-development--testing) • [v2 Roadmap](#-v2-roadmap-multi-vendor-marketplace)
+[Storefront](https://vendor-vogue.vercel.app) • [Admin Portal](https://vendor-vogue-admin.vercel.app) • [API Health](https://vendorvogue.onrender.com/health) • [Architecture](#-system-architecture) • [Engineering Highlights](#-core-engineering-highlights) • [Local Development](#-local-development--testing) • [v2 Roadmap](#-v2-roadmap-multi-vendor-marketplace)
 
 </div>
 
@@ -329,11 +329,11 @@ Vendor Vogue v1 has been architecturally decoupled so that transitioning to a mu
 
 ---
 
-## 🌐 Live Demo & Preview
+## 🌐 Live Deployments & Preview
 
-* **Production Storefront Demo**: `https://demo.vendorvogue.com` *(Replace with your deployed Vercel URL)*
-* **Admin Portal Demo**: `https://admin.demo.vendorvogue.com` *(Replace with your deployed Vercel URL)*
-* **API Documentation**: `https://api.demo.vendorvogue.com/docs` *(Replace with your deployed backend URL)*
+* **Production Storefront**: [https://vendor-vogue.vercel.app](https://vendor-vogue.vercel.app)
+* **Operations Admin Portal**: [https://vendor-vogue-admin.vercel.app](https://vendor-vogue-admin.vercel.app)
+* **Backend API Health Check**: [https://vendorvogue.onrender.com/health](https://vendorvogue.onrender.com/health)
 
 ---
 
