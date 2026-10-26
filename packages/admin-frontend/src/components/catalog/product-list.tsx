@@ -177,11 +177,11 @@ export function ProductList({
       </div>
 
       {/* Status Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200/80 pb-2">
+      <div className="flex items-center gap-2 border-b border-slate-200/80 pb-2 overflow-x-auto scrollbar-none flex-nowrap">
         <button
           type="button"
           onClick={() => setStatusFilter("all")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 transition-all ${
             statusFilter === "all"
               ? "bg-slate-900 text-white shadow-sm"
               : "text-slate-600 hover:bg-slate-100"
@@ -192,7 +192,7 @@ export function ProductList({
         <button
           type="button"
           onClick={() => setStatusFilter("active")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 transition-all ${
             statusFilter === "active"
               ? "bg-emerald-600 text-white shadow-sm"
               : "text-slate-600 hover:bg-slate-100"
@@ -203,7 +203,7 @@ export function ProductList({
         <button
           type="button"
           onClick={() => setStatusFilter("inactive")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 transition-all ${
             statusFilter === "inactive"
               ? "bg-slate-600 text-white shadow-sm"
               : "text-slate-600 hover:bg-slate-100"
@@ -213,179 +213,286 @@ export function ProductList({
         </button>
       </div>
 
-      {/* Products Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-semibold uppercase tracking-wider">
-              <tr>
-                <th className="py-3.5 px-6">Product</th>
-                <th className="py-3.5 px-6">Classification</th>
-                <th className="py-3.5 px-6">HSN Code</th>
-                <th className="py-3.5 px-6">GST Tier</th>
-                <th className="py-3.5 px-6">Status</th>
-                <th className="py-3.5 px-6">Created</th>
-                <th className="py-3.5 px-6 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
-              {filteredProducts.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-400">
-                    <Shirt className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-                    No products found. Click "Create Apparel Product" to add one.
-                  </td>
-                </tr>
-              ) : (
-                filteredProducts.map((p) => {
-                  const pId = p.id || p._id;
-                  const primaryImage =
-                    Array.isArray(p.images) && p.images.length > 0
-                      ? p.images[0]
-                      : null;
+      {filteredProducts.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-400 shadow-sm">
+          <Shirt className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+          No products found. Click &quot;Create Apparel Product&quot; to add one.
+        </div>
+      ) : (
+        <>
+          {/* Mobile Card Layout (< md viewports) */}
+          <div className="grid grid-cols-1 gap-3 md:hidden">
+            {filteredProducts.map((p) => {
+              const pId = p.id || p._id;
+              const primaryImage =
+                Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null;
 
-                  return (
-                    <tr key={pId} className="hover:bg-slate-50/80 transition-colors">
-                      {/* Product Title & Thumbnail */}
-                      <td className="py-4 px-6">
-                        <div
-                          onClick={() => setSelectedProductForDetail(pId)}
-                          className="flex items-center gap-3 cursor-pointer group"
-                        >
-                          {primaryImage ? (
-                            <img
-                              src={getOptimizedImageUrl(primaryImage, {
-                                width: 100,
-                                height: 100,
-                                crop: "fill",
-                              })}
-                              alt={p.name}
-                              className="w-11 h-11 rounded-lg object-cover bg-slate-100 border border-slate-200 group-hover:border-slate-300 transition-colors shrink-0"
-                            />
-                          ) : (
-                            <div className="w-11 h-11 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center font-bold text-xs shrink-0 group-hover:border-emerald-300 transition-colors">
-                              <Shirt className="w-5 h-5" />
-                            </div>
-                          )}
-                          <div className="min-w-0">
-                            <span className="font-semibold text-slate-900 block truncate group-hover:text-emerald-700 transition-colors">
-                              {p.name}
-                            </span>
-                            <span className="font-mono text-[11px] text-slate-400 block truncate">
-                              {p.slug}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
+              return (
+                <div
+                  key={pId}
+                  className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3"
+                >
+                  <div className="flex items-start gap-3">
+                    {primaryImage ? (
+                      <img
+                        src={getOptimizedImageUrl(primaryImage, {
+                          width: 100,
+                          height: 100,
+                          crop: "fill",
+                        })}
+                        alt={p.name}
+                        className="w-14 h-14 rounded-xl object-cover bg-slate-100 border border-slate-200 shrink-0"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center font-bold text-xs shrink-0">
+                        <Shirt className="w-6 h-6" />
+                      </div>
+                    )}
 
-                      {/* Brand & Category */}
-                      <td className="py-4 px-6 text-xs text-slate-600">
-                        <div>
-                          <span className="font-medium text-slate-900 block">
-                            {p.brand?.name || (typeof p.brand === "string" ? p.brand : "Brand")}
-                          </span>
-                          <span className="text-slate-400 block">
-                            {p.category?.name ||
-                              (typeof p.category === "string" ? p.category : "Category")}
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* HSN Code */}
-                      <td className="py-4 px-6">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded font-mono text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                          {p.hsnCode || "620520"}
-                        </span>
-                      </td>
-
-                      {/* GST Tier */}
-                      <td className="py-4 px-6">
-                        <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          {p.gstRate || 5}% GST
-                        </span>
-                      </td>
-
-                      {/* Status */}
-                      <td className="py-4 px-6">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-semibold text-slate-900 text-sm truncate">
+                          {p.name}
+                        </h3>
                         {p.isActive !== false ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <CheckCircle2 className="w-3 h-3" />
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
                             Active
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
-                            <XCircle className="w-3 h-3" />
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
                             Inactive
                           </span>
                         )}
-                      </td>
+                      </div>
+                      <span className="text-[11px] text-slate-500 block truncate mt-0.5">
+                        {p.brand?.name || (typeof p.brand === "string" ? p.brand : "Brand")} • {p.category?.name || (typeof p.category === "string" ? p.category : "Category")}
+                      </span>
+                      <div className="flex items-center gap-1.5 mt-1.5">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded font-mono text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                          HSN: {p.hsnCode || "620520"}
+                        </span>
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          {p.gstRate || 5}% GST
+                        </span>
+                      </div>
+                    </div>
+                  </div>
 
-                      {/* Created */}
-                      <td className="py-4 px-6 text-xs text-slate-400">
-                        {formatDateTime(p.createdAt)}
-                      </td>
+                  {/* Mobile Quick Action Buttons */}
+                  <div className="grid grid-cols-4 gap-2 pt-2 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedProductForDetail(pId)}
+                      className="py-2 px-1 text-center bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-colors"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>View</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedProductForEdit(p)}
+                      className="py-2 px-1 text-center bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-colors"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleStatus(p)}
+                      disabled={togglingProductId === pId}
+                      className={`py-2 px-1 text-center rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-colors ${
+                        p.isActive !== false
+                          ? "bg-amber-50 hover:bg-amber-100 text-amber-700"
+                          : "bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
+                      }`}
+                    >
+                      {togglingProductId === pId ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Power className="w-3.5 h-3.5" />
+                      )}
+                      <span>{p.isActive !== false ? "Pause" : "Live"}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedProductForDelete(p)}
+                      className="py-2 px-1 text-center bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Del</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-                      {/* Row Actions */}
-                      <td className="py-4 px-6 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          {/* Inspect / View */}
-                          <button
-                            type="button"
+          {/* Desktop Products Table (md and larger viewports) */}
+          <div className="hidden md:block bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-semibold uppercase tracking-wider">
+                  <tr>
+                    <th className="py-3.5 px-6">Product</th>
+                    <th className="py-3.5 px-6">Classification</th>
+                    <th className="py-3.5 px-6">HSN Code</th>
+                    <th className="py-3.5 px-6">GST Tier</th>
+                    <th className="py-3.5 px-6">Status</th>
+                    <th className="py-3.5 px-6">Created</th>
+                    <th className="py-3.5 px-6 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-slate-700">
+                  {filteredProducts.map((p) => {
+                    const pId = p.id || p._id;
+                    const primaryImage =
+                      Array.isArray(p.images) && p.images.length > 0
+                        ? p.images[0]
+                        : null;
+
+                    return (
+                      <tr key={pId} className="hover:bg-slate-50/80 transition-colors">
+                        {/* Product Title & Thumbnail */}
+                        <td className="py-4 px-6">
+                          <div
                             onClick={() => setSelectedProductForDetail(pId)}
-                            title="Inspect Details & SKUs"
-                            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                            className="flex items-center gap-3 cursor-pointer group"
                           >
-                            <Eye className="w-4 h-4" />
-                          </button>
-
-                          {/* Edit */}
-                          <button
-                            type="button"
-                            onClick={() => setSelectedProductForEdit(p)}
-                            title="Edit Product"
-                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-
-                          {/* Quick Toggle Status */}
-                          <button
-                            type="button"
-                            onClick={() => handleToggleStatus(p)}
-                            disabled={togglingProductId === pId}
-                            title={p.isActive !== false ? "Deactivate Product" : "Activate Product"}
-                            className={`p-1.5 rounded-lg transition-colors ${
-                              p.isActive !== false
-                                ? "text-slate-400 hover:text-amber-600 hover:bg-amber-50"
-                                : "text-slate-400 hover:text-emerald-600 hover:bg-emerald-50"
-                            }`}
-                          >
-                            {togglingProductId === pId ? (
-                              <Loader2 className="w-4 h-4 animate-spin text-slate-500" />
+                            {primaryImage ? (
+                              <img
+                                src={getOptimizedImageUrl(primaryImage, {
+                                  width: 100,
+                                  height: 100,
+                                  crop: "fill",
+                                })}
+                                alt={p.name}
+                                className="w-11 h-11 rounded-lg object-cover bg-slate-100 border border-slate-200 group-hover:border-slate-300 transition-colors shrink-0"
+                              />
                             ) : (
-                              <Power className="w-4 h-4" />
+                              <div className="w-11 h-11 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center font-bold text-xs shrink-0 group-hover:border-emerald-300 transition-colors">
+                                <Shirt className="w-5 h-5" />
+                              </div>
                             )}
-                          </button>
+                            <div className="min-w-0">
+                              <span className="font-semibold text-slate-900 block truncate group-hover:text-emerald-700 transition-colors">
+                                {p.name}
+                              </span>
+                              <span className="font-mono text-[11px] text-slate-400 block truncate">
+                                {p.slug}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
 
-                          {/* Delete */}
-                          <button
-                            type="button"
-                            onClick={() => setSelectedProductForDelete(p)}
-                            title="Delete Product"
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                        {/* Brand & Category */}
+                        <td className="py-4 px-6 text-xs text-slate-600">
+                          <div>
+                            <span className="font-medium text-slate-900 block">
+                              {p.brand?.name || (typeof p.brand === "string" ? p.brand : "Brand")}
+                            </span>
+                            <span className="text-slate-400 block">
+                              {p.category?.name ||
+                                (typeof p.category === "string" ? p.category : "Category")}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* HSN Code */}
+                        <td className="py-4 px-6">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded font-mono text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                            {p.hsnCode || "620520"}
+                          </span>
+                        </td>
+
+                        {/* GST Tier */}
+                        <td className="py-4 px-6">
+                          <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            {p.gstRate || 5}% GST
+                          </span>
+                        </td>
+
+                        {/* Status */}
+                        <td className="py-4 px-6">
+                          {p.isActive !== false ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              <CheckCircle2 className="w-3 h-3" />
+                              Active
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                              <XCircle className="w-3 h-3" />
+                              Inactive
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Created */}
+                        <td className="py-4 px-6 text-xs text-slate-400">
+                          {formatDateTime(p.createdAt)}
+                        </td>
+
+                        {/* Row Actions */}
+                        <td className="py-4 px-6 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            {/* Inspect / View */}
+                            <button
+                              type="button"
+                              onClick={() => setSelectedProductForDetail(pId)}
+                              title="Inspect Details & SKUs"
+                              className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+
+                            {/* Edit */}
+                            <button
+                              type="button"
+                              onClick={() => setSelectedProductForEdit(p)}
+                              title="Edit Product"
+                              className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+
+                            {/* Quick Toggle Status */}
+                            <button
+                              type="button"
+                              onClick={() => handleToggleStatus(p)}
+                              disabled={togglingProductId === pId}
+                              title={p.isActive !== false ? "Deactivate Product" : "Activate Product"}
+                              className={`p-1.5 rounded-lg transition-colors ${
+                                p.isActive !== false
+                                  ? "text-slate-400 hover:text-amber-600 hover:bg-amber-50"
+                                  : "text-slate-400 hover:text-emerald-600 hover:bg-emerald-50"
+                              }`}
+                            >
+                              {togglingProductId === pId ? (
+                                <Loader2 className="w-4 h-4 animate-spin text-slate-500" />
+                              ) : (
+                                <Power className="w-4 h-4" />
+                              )}
+                            </button>
+
+                            {/* Delete */}
+                            <button
+                              type="button"
+                              onClick={() => setSelectedProductForDelete(p)}
+                              title="Delete Product"
+                              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Product Detail & Variant Inspector Modal */}
       <ProductDetailModal

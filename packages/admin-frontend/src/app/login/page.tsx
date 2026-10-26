@@ -81,7 +81,7 @@ function LoginForm() {
         </div>
 
         {/* Login Card */}
-        <div className="bg-slate-800/90 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-8 shadow-2xl">
+        <div className="bg-slate-800/90 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-6 sm:p-8 shadow-2xl">
           {error && (
             <div className="mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-3 text-rose-400 text-sm animate-in fade-in">
               <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />

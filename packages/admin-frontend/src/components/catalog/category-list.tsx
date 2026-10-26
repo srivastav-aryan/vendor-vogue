@@ -447,7 +447,7 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
         </div>
 
         {/* View Mode Switcher + Add Category Button */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
           {/* Refresh Button */}
           <button
             type="button"

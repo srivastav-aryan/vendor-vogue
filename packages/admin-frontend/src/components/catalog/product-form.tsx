@@ -185,11 +185,11 @@ export function ProductForm({ brands, categories }: ProductFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl pb-16">
       {/* Top action header */}
-      <div className="flex items-center justify-between pb-4 border-b border-slate-200">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200">
+        <div className="flex items-start sm:items-center gap-3">
           <Link
             href="/catalog/products"
-            className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors shrink-0 mt-0.5 sm:mt-0"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
@@ -203,17 +203,17 @@ export function ProductForm({ brands, categories }: ProductFormProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-end gap-3 w-full sm:w-auto">
           <Link
             href="/catalog/products"
-            className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+            className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors text-center"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800 text-white text-xs font-semibold rounded-xl shadow-md shadow-emerald-900/20 transition-all"
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800 text-white text-xs font-semibold rounded-xl shadow-md shadow-emerald-900/20 transition-all flex-1 sm:flex-initial"
           >
             {isSubmitting ? (
               <>

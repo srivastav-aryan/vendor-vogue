@@ -162,11 +162,11 @@ export function BrandList({ initialBrands }: BrandListProps) {
       </div>
 
       {/* Status Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200/80 pb-2">
+      <div className="flex items-center gap-2 border-b border-slate-200/80 pb-2 overflow-x-auto scrollbar-none flex-nowrap">
         <button
           type="button"
           onClick={() => setStatusFilter("all")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 transition-all ${
             statusFilter === "all"
               ? "bg-slate-900 text-white shadow-sm"
               : "text-slate-600 hover:bg-slate-100"
@@ -177,7 +177,7 @@ export function BrandList({ initialBrands }: BrandListProps) {
         <button
           type="button"
           onClick={() => setStatusFilter("active")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 transition-all ${
             statusFilter === "active"
               ? "bg-emerald-600 text-white shadow-sm"
               : "text-slate-600 hover:bg-slate-100"
@@ -188,7 +188,7 @@ export function BrandList({ initialBrands }: BrandListProps) {
         <button
           type="button"
           onClick={() => setStatusFilter("inactive")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 transition-all ${
             statusFilter === "inactive"
               ? "bg-slate-600 text-white shadow-sm"
               : "text-slate-600 hover:bg-slate-100"
